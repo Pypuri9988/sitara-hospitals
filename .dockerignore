@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.github
+npm-debug.log*
+Dockerfile
+.dockerignore
+README.md
+
+# Never bake secrets or patient data into the image
+.env*
+data

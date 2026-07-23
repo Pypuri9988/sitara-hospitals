@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6fbfb;
+  --foreground: #0b2b2a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans-custom), system-ui, sans-serif;
+
+  /* Primary brand — rich teal / emerald (calm, medical, premium) */
+  --color-brand-50: #eafaf8;
+  --color-brand-100: #c9f2ec;
+  --color-brand-200: #98e6dc;
+  --color-brand-300: #5fd3c6;
+  --color-brand-400: #2fb9ab;
+  --color-brand-500: #14a093;
+  --color-brand-600: #0b8378;
+  --color-brand-700: #0d6960;
+  --color-brand-800: #10534d;
+  --color-brand-900: #0f4340;
+
+  /* Secondary — deep ocean blue (trust, depth for gradients) */
+  --color-secondary-50: #eef4fb;
+  --color-secondary-100: #d3e3f6;
+  --color-secondary-200: #a9c8ec;
+  --color-secondary-300: #75a5de;
+  --color-secondary-400: #4a82cd;
+  --color-secondary-500: #2f66b3;
+  --color-secondary-600: #235195;
+  --color-secondary-700: #1e4179;
+  --color-secondary-800: #1b3663;
+  --color-secondary-900: #142b4d;
+
+  /* Accent — warm coral (friendly, high-contrast CTAs) */
+  --color-accent-400: #ff8a6b;
+  --color-accent-500: #f56a45;
+  --color-accent-600: #e25130;
+
+  --color-whatsapp: #25d366;
+
+  /* Rich, soft elevation shadows */
+  --shadow-soft: 0 10px 30px -12px rgba(13, 105, 96, 0.25);
+  --shadow-card: 0 18px 40px -18px rgba(16, 83, 77, 0.35);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Rich decorative background used behind light sections */
+.bg-mesh {
+  background-image:
+    radial-gradient(40rem 40rem at 110% -10%, rgba(20, 160, 147, 0.10), transparent 60%),
+    radial-gradient(36rem 36rem at -10% 20%, rgba(47, 102, 179, 0.08), transparent 60%);
+}
+
+.shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+.shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes pulseRing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(37, 211, 102, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulseRing 2.2s infinite;
+}
+
+/* Thin, tidy scrollbars for horizontal carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
