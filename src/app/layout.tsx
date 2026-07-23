@@ -17,7 +17,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://sitara360care.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://sitara360.com"),
   title: {
     default: `${siteConfig.name} | ${siteConfig.doctor.name}, ${siteConfig.location}`,
     template: `%s | ${siteConfig.name}`,

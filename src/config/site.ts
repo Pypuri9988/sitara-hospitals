@@ -22,7 +22,7 @@ export const siteConfig = {
   whatsappNumber: "918712126799",
   whatsappDefaultMessage:
     "Hello Sitara360 Care, I would like to book a consultation with Dr. Neelu Mahendra.",
-  email: "care@sitara360care.com",
+  email: "care@sitara360.com",
   address: "Sri Sitara Hospital, Tanuku, West Godavari, Andhra Pradesh 534211",
   mapQuery: "Sri Sitara Hospital, Tanuku, Andhra Pradesh",
   hours: "Mon - Sat: 9:00 AM - 8:00 PM  |  Walk-ins welcome",
