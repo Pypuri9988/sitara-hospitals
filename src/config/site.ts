@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "Sitara360 Care",
   shortName: "Sitara360",
-  hospitalName: "Sri Sitara Hospital",
+  hospitalName: "Sri Sitara 360 Care",
   tagline: "Medicine that treats you — not just your numbers",
   location: "Tanuku, Andhra Pradesh",
   doctor: {
@@ -12,7 +12,7 @@ export const siteConfig = {
       { label: "MRCP-UK", detail: "Royal Colleges, London" },
       { label: "10+ Years", detail: "Clinical Practice" },
     ],
-    photo: "/images/doctor-neelu.png",
+    photo: "/images/doctor-sitara360.png",
   },
   description:
     "Sitara Holistic Care in Tanuku offers globally trained, evidence-based, whole-person medicine for diabetes, weight, blood pressure, thyroid and healthy aging.",
@@ -23,7 +23,8 @@ export const siteConfig = {
   whatsappDefaultMessage:
     "Hello Sitara360 Care, I would like to book a consultation with Dr. Neelu Mahendra.",
   email: "care@sitara360.com",
-  address: "Sri Sitara Hospital, Tanuku, West Godavari, Andhra Pradesh 534211",
+  address: "Sri Sitara 360 Care, Tanuku, West Godavari, Andhra Pradesh 534211",
+  // Keep the map search on the Google-registered hospital name so the pin resolves.
   mapQuery: "Sri Sitara Hospital, Tanuku, Andhra Pradesh",
   hours: "Mon - Sat: 9:00 AM - 8:00 PM  |  Walk-ins welcome",
   highlights: {
@@ -38,7 +39,7 @@ export const siteConfig = {
   images: {
     hospital: "/images/hospital-exterior.png",
     clinic: "/images/clinic-interior.png",
-    doctor: "/images/doctor-neelu.png",
+    doctor: "/images/doctor-sitara360.png",
   },
 } as const;
 

@@ -7,16 +7,7 @@ export type NavItem = {
 export const mainNav: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "#about" },
-  {
-    label: "Prescription Model",
-    href: "#care-model",
-    children: [
-      { label: "Metabolic Health", href: "#care-model" },
-      { label: "Chronic Disease Care", href: "#care-model" },
-      { label: "Senior Care", href: "#care-model" },
-    ],
-  },
-  { label: "Conditions", href: "#conditions" },
+  { label: "Body Analysis", href: "#body-analysis" },
   { label: "Patient Stories", href: "#testimonials" },
   { label: "FAQs", href: "#faqs" },
   { label: "Location", href: "#location" },

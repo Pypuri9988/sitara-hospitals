@@ -1,7 +1,7 @@
 import { Hero } from "@/components/Hero";
 import { About } from "@/components/About";
-import { Conditions } from "@/components/Conditions";
-import { CareModel } from "@/components/CareModel";
+import { BodyComposition } from "@/components/BodyComposition";
+import { DoctorVideo } from "@/components/DoctorVideo";
 import { FirstVisit } from "@/components/FirstVisit";
 import { Testimonials } from "@/components/Testimonials";
 import { BookingSection } from "@/components/BookingSection";
@@ -12,9 +12,9 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <BodyComposition />
+      <DoctorVideo src="/videos/Siatara.mp4" />
       <About />
-      <Conditions />
-      <CareModel />
       <FirstVisit />
       <Testimonials />
       <BookingSection />

@@ -16,7 +16,7 @@ import { notifyDoctorWhatsApp } from "@/lib/notify";
 import { siteConfig, mapLink } from "@/config/site";
 import { conditions } from "@/data/content";
 
-type Flow = "book" | "register" | null;
+type Flow = "book" | "register" | "service" | null;
 type Session = {
   flow: Flow;
   step: string;
@@ -76,6 +76,8 @@ async function sendMainMenu(to: string) {
     [
       { id: "menu:book", title: "📅 Book Appointment", description: "Schedule a doctor consultation" },
       { id: "menu:register", title: "📝 New Patient Reg.", description: "Register as a new patient" },
+      { id: "menu:sample", title: "💉 Home Sample Pickup", description: "Blood samples collected at home" },
+      { id: "menu:medicine", title: "💊 Medicine Delivery", description: "Medicines delivered to your home" },
       { id: "menu:conditions", title: "🩺 Conditions Treated", description: "What Dr. Neelu specialises in" },
       { id: "menu:timings", title: "🕐 Timings & Location", description: "Hours and how to reach us" },
       { id: "menu:homevisit", title: "🏠 Home Visit", description: "Care at home for seniors" },
@@ -120,6 +122,7 @@ export async function handleIncoming(from: string, msg: Incoming): Promise<void>
   // Active flows.
   if (session.flow === "book") return handleBooking(from, session, raw, choice);
   if (session.flow === "register") return handleRegister(from, session, raw, choice);
+  if (session.flow === "service") return handleService(from, session, raw, choice);
 
   // Not in a flow and not a recognised command → show the menu.
   await sendMainMenu(from);
@@ -137,6 +140,28 @@ async function handleMenu(from: string, action: string) {
       const s: Session = { flow: "register", step: "name", data: { phone: from }, updatedAt: Date.now() };
       save(from, s);
       await sendText(from, "Let's register you as a new patient. 📝\n\nWhat's the *patient's full name*?");
+      return;
+    }
+    case "sample": {
+      const s: Session = {
+        flow: "service",
+        step: "name",
+        data: { phone: from, service: "Home Sample Collection", emoji: "💉" },
+        updatedAt: Date.now(),
+      };
+      save(from, s);
+      await sendText(from, "💉 *Home Sample Collection*\n\nWe'll send a trained technician to collect your samples at home.\n\nFirst, what's the *patient's full name*?");
+      return;
+    }
+    case "medicine": {
+      const s: Session = {
+        flow: "service",
+        step: "name",
+        data: { phone: from, service: "Home Medicine Delivery", emoji: "💊" },
+        updatedAt: Date.now(),
+      };
+      save(from, s);
+      await sendText(from, "💊 *Home Medicine Delivery*\n\nWe'll deliver your medicines to your doorstep.\n\nFirst, what's your *full name*?");
       return;
     }
     case "conditions": {
@@ -329,6 +354,109 @@ async function finalizeBooking(from: string, s: Session) {
   await sendText(
     from,
     `✅ All done, ${appointment.name.split(" ")[0]}! Your request is received.\n\n*Reference:* ${appointment.id}\n${appointment.preferredDate || "Any day"} · ${appointment.preferredTime || "Any time"} · ${appointment.mode}\n\nOur team will call you shortly to confirm. Send *Hi* anytime for the menu.`
+  );
+}
+
+async function handleService(from: string, s: Session, raw: string, choice: string) {
+  const isMedicine = s.data.service === "Home Medicine Delivery";
+
+  switch (s.step) {
+    case "name":
+      if (raw.length < 2) {
+        await sendText(from, "Please enter a valid name so our team can address you correctly. 🙂");
+        return;
+      }
+      s.data.name = raw;
+      s.step = "address";
+      save(from, s);
+      await sendText(from, "📍 Please share your *exact address* — house/flat no, street and area.");
+      return;
+
+    case "address":
+      if (raw.length < 5) {
+        await sendText(from, "Please share a complete address (house/flat no, street, area) so we can reach you. 🏠");
+        return;
+      }
+      s.data.address = raw;
+      s.step = "landmark";
+      save(from, s);
+      await sendText(from, "🧭 Any nearby *landmark*? (e.g. opposite XYZ temple, near ABC school) — this helps us find you quickly.");
+      return;
+
+    case "landmark":
+      s.data.landmark = raw || "Not provided";
+      s.step = "details";
+      save(from, s);
+      if (isMedicine) {
+        await sendText(from, "💊 Which *medicines* do you need? You can list them here, or send a photo of your prescription.");
+      } else {
+        await sendText(from, "💉 Which *test(s)* do you need? Type the test name, or 'Doctor advised' if you're unsure.");
+      }
+      return;
+
+    case "details": {
+      // Accept text; if a photo/empty comes through, note it for the call.
+      s.data.details = raw || (isMedicine ? "Prescription shared / to confirm on call" : "To confirm on call");
+      s.step = "confirm";
+      save(from, s);
+      await sendButtons(
+        from,
+        `Please confirm your request:\n\n${s.data.emoji} ${s.data.service}\n👤 ${s.data.name}\n📞 ${s.data.phone}\n📍 ${s.data.address}\n🧭 ${s.data.landmark}\n📝 ${s.data.details}`,
+        [
+          { id: "confirm:yes", title: "✅ Confirm" },
+          { id: "confirm:no", title: "✖ Cancel" },
+        ]
+      );
+      return;
+    }
+
+    case "confirm": {
+      if (choice === "confirm:no") {
+        clear(from);
+        await sendText(from, "No problem, request cancelled. Send *Hi* anytime to start again.");
+        return;
+      }
+      if (choice !== "confirm:yes") {
+        await sendText(from, "Please tap *Confirm* or *Cancel* above. 👆");
+        return;
+      }
+      await finalizeService(from, s);
+      return;
+    }
+
+    default:
+      clear(from);
+      await sendMainMenu(from);
+  }
+}
+
+async function finalizeService(from: string, s: Session) {
+  const request = {
+    id: generateId("SVC"),
+    service: s.data.service || "Home Service",
+    name: s.data.name || "WhatsApp User",
+    phone: s.data.phone || from,
+    address: s.data.address || "",
+    landmark: s.data.landmark || "",
+    details: s.data.details || "",
+    createdAt: new Date().toISOString(),
+  };
+  await appendToCollection("service_requests", request);
+
+  const notifyText =
+    `${s.data.emoji || "🏠"} New ${request.service} (WhatsApp bot) — ${siteConfig.name}\n` +
+    `Ref: ${request.id}\n` +
+    `Name: ${request.name}\n` +
+    `Phone: ${request.phone}\n` +
+    `Address: ${request.address}\n` +
+    `Landmark: ${request.landmark}\n` +
+    `Details: ${request.details}`;
+  await notifyDoctorWhatsApp(notifyText).catch(() => ({ ok: false }));
+
+  clear(from);
+  await sendText(
+    from,
+    `✅ Thank you, ${request.name.split(" ")[0]}! Your *${request.service}* request is received.\n\n*Reference:* ${request.id}\n📍 ${request.address}\n🧭 ${request.landmark}\n\nOur team will call you shortly to confirm the timing. Send *Hi* anytime for the menu.`
   );
 }
 

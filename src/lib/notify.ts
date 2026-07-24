@@ -89,23 +89,65 @@ export async function notifyDoctorWhatsApp(message: string): Promise<NotifyResul
   }
 }
 
+type TmbRecipient = { phone: string; apikey: string };
+
+/**
+ * Build the list of TextMeBot recipients. The primary is the business number
+ * (TEXTMEBOT_PHONE/APIKEY). Add extra alert numbers as pairs:
+ *   TEXTMEBOT_PHONE_2 / TEXTMEBOT_APIKEY_2  (e.g. the owner's personal phone)
+ * Each recipient needs its own one-time TextMeBot activation + apikey.
+ * If a recipient has no apikey of its own, the primary apikey is reused
+ * (works on TextMeBot plans where one apikey can send to multiple numbers).
+ */
+function textMeBotRecipients(): TmbRecipient[] {
+  const primaryKey = process.env.TEXTMEBOT_APIKEY || "";
+  const recipients: TmbRecipient[] = [];
+
+  const p1 = process.env.TEXTMEBOT_PHONE;
+  if (p1 && primaryKey) recipients.push({ phone: p1, apikey: primaryKey });
+
+  const p2 = process.env.TEXTMEBOT_PHONE_2;
+  if (p2) {
+    const k2 = process.env.TEXTMEBOT_APIKEY_2 || primaryKey;
+    if (k2) recipients.push({ phone: p2, apikey: k2 });
+  }
+
+  return recipients;
+}
+
+async function sendToOneTextMeBot(r: TmbRecipient, message: string): Promise<boolean> {
+  const url =
+    `https://api.textmebot.com/send.php?recipient=${encodeURIComponent(r.phone)}` +
+    `&apikey=${encodeURIComponent(r.apikey)}&text=${encodeURIComponent(message)}`;
+  try {
+    const res = await notifyFetch(url, { method: "GET" });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error(`[notify] textmebot -> ${r.phone} failed: HTTP ${res.status} ${body.slice(0, 120)}`);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error(`[notify] textmebot -> ${r.phone} error:`, err);
+    return false;
+  }
+}
+
 async function sendViaTextMeBot(message: string): Promise<NotifyResult> {
-  const phone = process.env.TEXTMEBOT_PHONE;
-  const apikey = process.env.TEXTMEBOT_APIKEY;
-  if (!phone || !apikey) {
+  const recipients = textMeBotRecipients();
+  if (recipients.length === 0) {
     console.log("[notify] textmebot selected but TEXTMEBOT_PHONE/APIKEY missing.");
     return { ok: false, provider: "textmebot", error: "missing-credentials" };
   }
-  const url =
-    `https://api.textmebot.com/send.php?recipient=${encodeURIComponent(phone)}` +
-    `&apikey=${encodeURIComponent(apikey)}&text=${encodeURIComponent(message)}`;
 
-  const res = await notifyFetch(url, { method: "GET" });
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    return { ok: false, provider: "textmebot", error: `HTTP ${res.status} ${body.slice(0, 120)}` };
-  }
-  return { ok: true, provider: "textmebot" };
+  // Send to every configured recipient; succeed if at least one delivers.
+  const results = await Promise.all(recipients.map((r) => sendToOneTextMeBot(r, message)));
+  const okAny = results.some(Boolean);
+  return {
+    ok: okAny,
+    provider: "textmebot",
+    error: okAny ? undefined : "all-recipients-failed",
+  };
 }
 
 async function sendViaCallMeBot(message: string): Promise<NotifyResult> {

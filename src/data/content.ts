@@ -13,6 +13,10 @@ import {
   Stethoscope,
   ShieldCheck,
   Home,
+  ScanLine,
+  Timer,
+  Gauge,
+  TrendingUp,
 } from "lucide-react";
 
 export type Condition = {
@@ -98,6 +102,29 @@ export const whyPoints: WhyPoint[] = [
   { title: "Root-cause approach", detail: "We look for why you're unwell, not just which number to lower.", icon: Stethoscope },
   { title: "Time to listen", detail: "Longer consultations so nothing important gets missed.", icon: Clock },
   { title: "Care at home", detail: "Home visits available for seniors and those who cannot travel easily.", icon: Home },
+];
+
+export type BodyCompositionPoint = {
+  title: string;
+  detail: string;
+  icon: LucideIcon;
+};
+
+export const bodyCompositionPoints: BodyCompositionPoint[] = [
+  { title: "See inside your body", detail: "Fat, muscle, water & hidden belly fat — one scan.", icon: ScanLine },
+  { title: "60 seconds, painless", detail: "Just stand on it. No needles, no blood.", icon: Timer },
+  { title: "Beyond the weight scale", detail: "Know your metabolic age & organ fat.", icon: Gauge },
+  { title: "Track real progress", detail: "See change month after month.", icon: TrendingUp },
+];
+
+export const bodyCompositionMetrics: string[] = [
+  "Body Fat %",
+  "Muscle Mass",
+  "Visceral Fat",
+  "Body Water",
+  "BMI",
+  "Metabolic Age",
+  "Segmental Analysis",
 ];
 
 export type Testimonial = {

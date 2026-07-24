@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { MessageCircle, CalendarCheck, MapPin, PhoneCall, CheckCircle2 } from "lucide-react";
+import { MessageCircle, CalendarCheck, MapPin, PhoneCall, CheckCircle2, ScanLine, ArrowRight } from "lucide-react";
 import { siteConfig, whatsappLink, telLink, mapLink } from "@/config/site";
 
 export function Hero() {
@@ -49,6 +49,27 @@ export function Hero() {
                 )
               )}
           </div>
+
+          <a
+            href="#body-analysis"
+            className="group mt-6 flex items-center gap-3 rounded-2xl bg-white/10 p-3 pr-4 ring-1 ring-accent-400/60 backdrop-blur transition hover:bg-white/15 sm:max-w-md"
+          >
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-500 text-white shadow-lg">
+              <ScanLine className="h-6 w-6" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center gap-2 text-sm font-bold text-white">
+                New: Body Composition Analysis
+                <span className="rounded-full bg-accent-500 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide">
+                  60-sec
+                </span>
+              </span>
+              <span className="block text-xs text-brand-100">
+                Body fat, muscle, water &amp; metabolic age — in one painless scan
+              </span>
+            </span>
+            <ArrowRight className="h-5 w-5 shrink-0 text-accent-400 transition group-hover:translate-x-0.5" />
+          </a>
 
           <div className="mt-7 flex flex-wrap gap-3">
             <a
