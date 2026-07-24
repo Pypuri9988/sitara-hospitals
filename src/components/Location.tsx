@@ -8,14 +8,14 @@ export function Location() {
       <div className="mx-auto max-w-7xl">
         <SectionHeading
           eyebrow="Find Us"
-          title={`Visit ${siteConfig.hospitalName}`}
+          title={`Visit ${siteConfig.locationName}`}
           subtitle="Located in the heart of Tanuku. Walk in when you're ready — no appointment needed for your first visit."
         />
 
         <div className="mt-10 grid gap-6 lg:grid-cols-2">
           <div className="overflow-hidden rounded-3xl border border-slate-100 shadow-sm">
             <iframe
-              title={`${siteConfig.hospitalName} location map`}
+              title={`${siteConfig.locationName} location map`}
               src={`https://www.google.com/maps?q=${encodeURIComponent(
                 siteConfig.mapQuery
               )}&output=embed`}

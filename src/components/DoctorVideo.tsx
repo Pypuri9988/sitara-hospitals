@@ -12,7 +12,7 @@ type DoctorVideoProps = {
 
 const points = [
   "Globally trained — MRCP-UK, Royal Colleges, London",
-  "Root-cause, whole-person care — not just prescriptions",
+  "Root-cause, personalized care — not just prescriptions",
   "Unhurried consultations, time to truly listen",
 ];
 

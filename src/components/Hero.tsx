@@ -31,8 +31,8 @@ export function Hero() {
 
           <p className="mt-4 max-w-xl text-base leading-relaxed text-brand-100 sm:text-lg">
             {siteConfig.doctor.name} brings globally trained, evidence-based,
-            whole-person care to {siteConfig.location} — for diabetes, weight,
-            blood pressure, thyroid and aging well.
+            personalized care to {siteConfig.location} — for diabetes, obesity,
+            blood pressure, thyroid and healthy aging.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-2">
@@ -136,7 +136,7 @@ export function Hero() {
                 className="mt-4 flex items-center justify-center gap-2 rounded-xl border border-brand-200 px-4 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50"
               >
                 <MapPin className="h-4 w-4" />
-                {siteConfig.hospitalName}, {siteConfig.location}
+                {siteConfig.locationName}, {siteConfig.location}
               </a>
             </div>
           </div>

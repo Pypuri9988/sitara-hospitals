@@ -31,7 +31,7 @@ export const conditions: Condition[] = [
   { name: "Obesity & Metabolic Health", icon: Scale, description: "Investigating insulin resistance and hormones behind stubborn weight gain." },
   { name: "Thyroid & Fatty Liver", icon: Activity, description: "Careful evaluation of thyroid and liver issues that are often missed elsewhere." },
   { name: "Senior & Geriatric Care", icon: UserRound, description: "Unhurried, respectful care for older adults, with home visits when travel is hard." },
-  { name: "PCOS & Hormonal Health", icon: Venus, description: "Whole-person care for PCOS and hormonal imbalance that goes beyond symptoms." },
+  { name: "PCOS & Hormonal Health", icon: Venus, description: "Personalized care for PCOS and hormonal imbalance that goes beyond symptoms." },
 ];
 
 export type CareModel = {
@@ -47,7 +47,7 @@ export const careModels: CareModel[] = [
     key: "metabolic",
     title: "Metabolic Health",
     icon: Scale,
-    description: "For diabetes, weight, insulin resistance, thyroid and PCOS.",
+    description: "For diabetes, obesity, insulin resistance, thyroid and PCOS.",
     points: [
       "Detailed metabolic assessment",
       "Personalised nutrition & lifestyle plan",
@@ -69,7 +69,7 @@ export const careModels: CareModel[] = [
     key: "senior",
     title: "Senior Care",
     icon: Home,
-    description: "For older adults who need patient, dignified, whole-person care.",
+    description: "For older adults who need patient, dignified, personalized care.",
     points: [
       "Longer, unhurried consultations",
       "Home visits for those who can't travel",

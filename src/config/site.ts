@@ -2,6 +2,8 @@ export const siteConfig = {
   name: "Sitara360 Care",
   shortName: "Sitara360",
   hospitalName: "Sri Sitara 360 Care",
+  // Physical premises name shown next to location/map pins (Google-registered).
+  locationName: "Sri Sitara Hospital",
   tagline: "Medicine that treats you — not just your numbers",
   location: "Tanuku, Andhra Pradesh",
   doctor: {
@@ -15,7 +17,7 @@ export const siteConfig = {
     photo: "/images/doctor-sitara360.png",
   },
   description:
-    "Sitara Holistic Care in Tanuku offers globally trained, evidence-based, whole-person medicine for diabetes, weight, blood pressure, thyroid and healthy aging.",
+    "Sitara Holistic Care in Tanuku offers globally trained, evidence-based, personalized medicine for diabetes, obesity, blood pressure, thyroid and healthy aging.",
   // Update these with your real numbers.
   phone: "+91 87121 26799",
   // WhatsApp business number in international format WITHOUT + or spaces.
@@ -23,7 +25,7 @@ export const siteConfig = {
   whatsappDefaultMessage:
     "Hello Sitara360 Care, I would like to book a consultation with Dr. Neelu Mahendra.",
   email: "care@sitara360.com",
-  address: "Sri Sitara 360 Care, Tanuku, West Godavari, Andhra Pradesh 534211",
+  address: "Sri Sitara Hospital, Tanuku, West Godavari, Andhra Pradesh 534211",
   // Keep the map search on the Google-registered hospital name so the pin resolves.
   mapQuery: "Sri Sitara Hospital, Tanuku, Andhra Pradesh",
   hours: "Mon - Sat: 9:00 AM - 8:00 PM  |  Walk-ins welcome",

@@ -31,7 +31,7 @@ export function About() {
             About the Doctor
           </span>
           <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-            Whole-person care, backed by global training
+            Personalized care, backed by global training
           </h2>
           <p className="mt-4 text-base leading-relaxed text-slate-600">
             {siteConfig.doctor.name} is a consultant physician who kept seeing

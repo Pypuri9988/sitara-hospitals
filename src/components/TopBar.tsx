@@ -7,7 +7,7 @@ export function TopBar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 text-sm">
         <div className="flex items-center gap-2 text-brand-100">
           <MapPin className="h-4 w-4 text-accent-400" />
-          {siteConfig.hospitalName}, {siteConfig.location}
+          {siteConfig.locationName}, {siteConfig.location}
         </div>
         <div className="flex items-center gap-6">
           <span className="inline-flex items-center gap-2 text-brand-200">
