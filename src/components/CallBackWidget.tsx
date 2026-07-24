@@ -72,15 +72,18 @@ export function CallBackWidget() {
 
   return (
     <>
-      {/* Side tab launcher (vertical, flush to the left edge) */}
+      {/* Edge launcher: a compact icon flush to the left edge that expands to a
+          labelled pill on hover (desktop). On mobile it stays a small, subtle
+          icon so it never blocks content while scrolling. */}
       <button
         onClick={() => setOpen(true)}
         aria-label="Request a call back"
-        style={{ writingMode: "vertical-rl" }}
-        className="fixed left-0 top-1/2 z-40 flex -translate-y-1/2 items-center gap-2 rounded-r-xl bg-accent-500 px-2.5 py-4 text-sm font-semibold text-white shadow-lg transition hover:bg-accent-600"
+        className="group fixed left-0 top-1/2 z-40 flex -translate-y-1/2 items-center overflow-hidden rounded-r-full bg-accent-500 px-3 py-3 text-sm font-semibold text-white opacity-80 shadow-lg transition-all duration-300 hover:bg-accent-600 hover:opacity-100 focus-visible:opacity-100"
       >
-        <PhoneCall className="h-4 w-4 rotate-90" />
-        Request a Call Back
+        <PhoneCall className="h-5 w-5 shrink-0" />
+        <span className="hidden max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-300 group-hover:ml-2 group-hover:max-w-[180px] group-hover:opacity-100 sm:inline">
+          Request a Call Back
+        </span>
       </button>
 
       {/* Modal */}
