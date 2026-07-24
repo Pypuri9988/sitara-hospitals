@@ -72,13 +72,14 @@ export function CallBackWidget() {
 
   return (
     <>
-      {/* Side tab launcher */}
+      {/* Side tab launcher (vertical, flush to the left edge) */}
       <button
         onClick={() => setOpen(true)}
         aria-label="Request a call back"
-        className="fixed left-0 top-1/2 z-40 flex -translate-y-1/2 origin-left -rotate-90 items-center gap-2 rounded-b-xl bg-accent-500 px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-accent-600"
+        style={{ writingMode: "vertical-rl" }}
+        className="fixed left-0 top-1/2 z-40 flex -translate-y-1/2 items-center gap-2 rounded-r-xl bg-accent-500 px-2.5 py-4 text-sm font-semibold text-white shadow-lg transition hover:bg-accent-600"
       >
-        <PhoneCall className="h-4 w-4" />
+        <PhoneCall className="h-4 w-4 rotate-90" />
         Request a Call Back
       </button>
 
