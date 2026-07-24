@@ -7,11 +7,11 @@ import {
   Send,
   Bot,
   CheckCircle2,
-  MessageCircle,
   MapPin,
   Loader2,
 } from "lucide-react";
 import { siteConfig, whatsappLink, mapLink } from "@/config/site";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 import { conditions, faqs } from "@/data/content";
 
 type Option = { label: string; action: string };
@@ -433,7 +433,7 @@ export function ChatBot() {
                       rel="noopener noreferrer"
                       className="mt-2 inline-flex items-center gap-2 rounded-xl bg-whatsapp px-3 py-2 text-xs font-semibold text-white transition hover:brightness-105"
                     >
-                      <MessageCircle className="h-4 w-4" />
+                      <WhatsAppIcon className="h-4 w-4" />
                       Confirm on WhatsApp
                     </a>
                   )}

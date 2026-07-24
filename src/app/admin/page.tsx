@@ -8,13 +8,13 @@ import {
   CalendarCheck,
   UserPlus,
   Phone,
-  MessageCircle,
   Search,
   Users,
   Clock,
   Home,
 } from "lucide-react";
 import { siteConfig, telLink, whatsappLink } from "@/config/site";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 type Appointment = {
   id: string;
@@ -333,7 +333,7 @@ function ContactButtons({ name, phone }: { name: string; phone: string }) {
         className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-green-50 text-whatsapp transition hover:bg-whatsapp hover:text-white"
         aria-label={`WhatsApp ${name}`}
       >
-        <MessageCircle className="h-4 w-4" />
+        <WhatsAppIcon className="h-4 w-4" />
       </a>
     </div>
   );

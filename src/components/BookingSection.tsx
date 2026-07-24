@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   CalendarCheck,
   UserPlus,
-  MessageCircle,
   PhoneCall,
   CheckCircle2,
   Loader2,
@@ -12,6 +11,7 @@ import {
 } from "lucide-react";
 import { siteConfig, whatsappLink, telLink } from "@/config/site";
 import { conditions } from "@/data/content";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 type Tab = "book" | "register";
 type Status = "idle" | "loading" | "success" | "error";
@@ -48,7 +48,7 @@ export function BookingSection() {
                 className="flex items-center gap-3 rounded-xl bg-white/10 p-4 ring-1 ring-white/15 transition hover:bg-white/15"
               >
                 <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-whatsapp text-white">
-                  <MessageCircle className="h-6 w-6" />
+                  <WhatsAppIcon className="h-6 w-6" />
                 </span>
                 <span>
                   <span className="block text-sm font-semibold">Chat on WhatsApp</span>
@@ -141,7 +141,7 @@ function SuccessCard({
         rel="noopener noreferrer"
         className="mt-5 inline-flex items-center gap-2 rounded-xl bg-whatsapp px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105"
       >
-        <MessageCircle className="h-4 w-4" />
+        <WhatsAppIcon className="h-4 w-4" />
         Confirm on WhatsApp
       </a>
       <button

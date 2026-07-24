@@ -1,6 +1,7 @@
 import Image from "next/image";
-import { MessageCircle, CalendarCheck, MapPin, PhoneCall, CheckCircle2, ScanLine, ArrowRight } from "lucide-react";
+import { CalendarCheck, MapPin, PhoneCall, CheckCircle2, ScanLine, ArrowRight } from "lucide-react";
 import { siteConfig, whatsappLink, telLink, mapLink } from "@/config/site";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 export function Hero() {
   return (
@@ -85,7 +86,7 @@ export function Hero() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-xl bg-whatsapp px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:brightness-105"
             >
-              <MessageCircle className="h-4 w-4" />
+              <WhatsAppIcon className="h-4 w-4" />
               WhatsApp Us
             </a>
             <a

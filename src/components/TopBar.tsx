@@ -1,5 +1,6 @@
-import { Phone, Clock, MapPin, MessageCircle } from "lucide-react";
+import { Phone, Clock, MapPin } from "lucide-react";
 import { siteConfig, telLink, whatsappLink } from "@/config/site";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 export function TopBar() {
   return (
@@ -27,7 +28,7 @@ export function TopBar() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 font-medium transition hover:text-accent-400"
           >
-            <MessageCircle className="h-4 w-4" />
+            <WhatsAppIcon className="h-4 w-4" />
             WhatsApp
           </a>
         </div>

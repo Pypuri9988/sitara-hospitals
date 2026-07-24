@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUp, MessageCircle, Phone, CalendarCheck } from "lucide-react";
+import { ArrowUp, Phone, CalendarCheck } from "lucide-react";
 import { whatsappLink, telLink } from "@/config/site";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 export function FloatingActions() {
   const [showTop, setShowTop] = useState(false);
@@ -34,7 +35,7 @@ export function FloatingActions() {
           aria-label="Chat with us on WhatsApp"
           className="animate-pulse-ring group inline-flex items-center gap-2 rounded-full bg-whatsapp px-4 py-3 font-semibold text-white shadow-lg transition hover:brightness-105"
         >
-          <MessageCircle className="h-6 w-6" />
+          <WhatsAppIcon className="h-6 w-6" />
           <span className="max-w-0 overflow-hidden whitespace-nowrap text-sm opacity-0 transition-all duration-300 group-hover:max-w-40 group-hover:opacity-100">
             Chat on WhatsApp
           </span>
@@ -56,7 +57,7 @@ export function FloatingActions() {
           rel="noopener noreferrer"
           className="flex flex-col items-center gap-1 border-x border-slate-100 py-2.5 text-xs font-medium text-whatsapp"
         >
-          <MessageCircle className="h-5 w-5" />
+          <WhatsAppIcon className="h-5 w-5" />
           WhatsApp
         </a>
         <Link

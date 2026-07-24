@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, Menu, X, MessageCircle, CalendarCheck } from "lucide-react";
+import { ChevronDown, Menu, X, CalendarCheck } from "lucide-react";
 import { mainNav } from "@/data/navigation";
 import { whatsappLink } from "@/config/site";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 import { Logo } from "./Logo";
 
 export function Header() {
@@ -74,7 +75,7 @@ export function Header() {
             aria-label="Chat on WhatsApp"
             className="hidden h-10 w-10 items-center justify-center rounded-lg text-whatsapp transition hover:bg-green-50 lg:inline-flex"
           >
-            <MessageCircle className="h-5 w-5" />
+            <WhatsAppIcon className="h-5 w-5" />
           </a>
           <Link
             href="/#book"

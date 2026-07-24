@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { MapPin, Phone, Mail, MessageCircle, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { siteConfig, telLink, whatsappLink } from "@/config/site";
 import { Logo } from "./Logo";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 type IconProps = { className?: string };
 
@@ -97,7 +98,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 transition hover:text-white"
                 >
-                  <MessageCircle className="h-4 w-4 text-accent-400" />
+                  <WhatsAppIcon className="h-4 w-4 text-accent-400" />
                   WhatsApp Chat
                 </a>
               </li>

@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Volume2, VolumeX, CheckCircle2, MessageCircle, CalendarCheck } from "lucide-react";
+import { Volume2, VolumeX, CheckCircle2, CalendarCheck } from "lucide-react";
 import { siteConfig, whatsappLink } from "@/config/site";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 type DoctorVideoProps = {
   /** Path served by the site, e.g. "/videos/Siatara.mp4" (file lives in public/videos/). */
@@ -81,7 +82,7 @@ export function DoctorVideo({ src, poster }: DoctorVideoProps) {
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-200 px-6 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50"
             >
-              <MessageCircle className="h-4 w-4" />
+              <WhatsAppIcon className="h-4 w-4" />
               Chat on WhatsApp
             </a>
           </div>

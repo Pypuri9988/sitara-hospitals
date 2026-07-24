@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { PhoneCall, X, Loader2, CheckCircle2, MessageCircle } from "lucide-react";
+import { PhoneCall, X, Loader2, CheckCircle2 } from "lucide-react";
 import { siteConfig, whatsappLink } from "@/config/site";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -137,7 +138,7 @@ export function CallBackWidget() {
                     rel="noopener noreferrer"
                     className="mt-5 inline-flex items-center gap-2 rounded-xl bg-whatsapp px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105"
                   >
-                    <MessageCircle className="h-4 w-4" />
+                    <WhatsAppIcon className="h-4 w-4" />
                     Confirm on WhatsApp
                   </a>
                   <button

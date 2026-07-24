@@ -1,6 +1,7 @@
-import { CheckCircle2, MessageCircle, HeartPulse } from "lucide-react";
+import { CheckCircle2, HeartPulse } from "lucide-react";
 import { whatsappLink } from "@/config/site";
 import { bodyCompositionPoints, bodyCompositionMetrics } from "@/data/content";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 import { SectionHeading } from "./SectionHeading";
 import { BodyCompositionCarousel } from "./BodyCompositionCarousel";
 
@@ -88,7 +89,7 @@ export function BodyComposition() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent-500 px-6 py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-accent-600 hover:shadow-lg"
               >
-                <MessageCircle className="h-4 w-4" />
+                <WhatsAppIcon className="h-4 w-4" />
                 Get Your Body Composition Test
               </a>
               <a
@@ -129,7 +130,7 @@ export function BodyComposition() {
             rel="noopener noreferrer"
             className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
           >
-            <MessageCircle className="h-4 w-4" />
+            <WhatsAppIcon className="h-4 w-4" />
             Ask on WhatsApp
           </a>
         </div>
