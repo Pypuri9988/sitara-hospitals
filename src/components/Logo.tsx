@@ -1,12 +1,23 @@
+import Image from "next/image";
 import Link from "next/link";
-import { HeartPulse } from "lucide-react";
 import { siteConfig } from "@/config/site";
 
 export function Logo({ light = false }: { light?: boolean }) {
   return (
     <Link href="/" className="group inline-flex items-center gap-2.5">
-      <span className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-400 via-brand-500 to-secondary-600 shadow-soft ring-1 ring-white/30 transition group-hover:scale-105">
-        <HeartPulse className="h-6 w-6 text-white" strokeWidth={2.5} />
+      <span
+        className={`relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl shadow-soft ring-1 transition group-hover:scale-105 ${
+          light ? "bg-white/10 ring-white/20" : "bg-white ring-slate-200"
+        }`}
+      >
+        <Image
+          src="/images/icon-sitara360.png"
+          alt={`${siteConfig.name} logo`}
+          width={44}
+          height={44}
+          className="h-full w-full object-cover"
+          priority
+        />
       </span>
       <span className="flex flex-col leading-none">
         <span

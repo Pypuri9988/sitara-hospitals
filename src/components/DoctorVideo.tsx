@@ -13,9 +13,9 @@ type DoctorVideoProps = {
 };
 
 const points = [
-  "Globally trained — MRCP-UK, Royal Colleges, London",
-  "Root-cause, personalized care — not just prescriptions",
-  "Exercise and Nutrition guidance",
+  "What your first visit looks like — step by step",
+  "How we explain reports in simple, clear language",
+  "When to choose a clinic visit vs a home visit",
 ];
 
 export function DoctorVideo({ src, poster }: DoctorVideoProps) {
@@ -48,16 +48,17 @@ export function DoctorVideo({ src, poster }: DoctorVideoProps) {
         {/* Text side */}
         <div className="order-2 lg:order-1">
           <span className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-600">
-            In His Own Words
+            Watch before you visit
           </span>
           <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
             A Message from Your Doctor
           </h2>
           <div className="mt-4 h-1 w-16 rounded-full bg-accent-500" />
           <p className="mt-5 text-base leading-relaxed text-slate-600">
-            Hear directly from {siteConfig.doctor.name} about the kind of care
-            you can expect — and why so many families in {siteConfig.location}{" "}
-            trust him with their health.
+            Press play for a short note from {siteConfig.doctor.name}. In under
+            a minute you&apos;ll know what to bring, how long your first visit
+            takes, and how we turn confusing reports into a clear next step —
+            so you arrive ready, not anxious.
           </p>
 
           <ul className="mt-6 space-y-3">

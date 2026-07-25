@@ -241,53 +241,68 @@ async function sendMediaViaMeta(
   }
 
   const isDocument = mimeType.startsWith("application/");
-  const ext = mimeType.includes("png")
+  const safeMime = mimeType || (isDocument ? "application/pdf" : "image/jpeg");
+  const ext = safeMime.includes("png")
     ? "png"
-    : mimeType.includes("pdf")
+    : safeMime.includes("pdf")
       ? "pdf"
-      : mimeType.includes("webp")
+      : safeMime.includes("webp")
         ? "webp"
         : "jpg";
   const filename = `prescription.${ext}`;
   const bytes = Buffer.from(base64, "base64");
 
-  // Step 1: upload media to Meta.
-  const form = new FormData();
-  form.append("messaging_product", "whatsapp");
-  form.append("type", mimeType || (isDocument ? "application/pdf" : "image/jpeg"));
-  form.append("file", new Blob([bytes], { type: mimeType || "image/jpeg" }), filename);
+  // Build a proper multipart body. Using a hand-rolled boundary avoids
+  // undici/DOM FormData mismatches that silently break Meta's media upload.
+  const boundary = `----SitaraBoundary${Date.now()}`;
+  const preamble =
+    `--${boundary}\r\n` +
+    `Content-Disposition: form-data; name="messaging_product"\r\n\r\n` +
+    `whatsapp\r\n` +
+    `--${boundary}\r\n` +
+    `Content-Disposition: form-data; name="type"\r\n\r\n` +
+    `${safeMime}\r\n` +
+    `--${boundary}\r\n` +
+    `Content-Disposition: form-data; name="file"; filename="${filename}"\r\n` +
+    `Content-Type: ${safeMime}\r\n\r\n`;
+  const closing = `\r\n--${boundary}--\r\n`;
+  const body = Buffer.concat([Buffer.from(preamble, "utf8"), bytes, Buffer.from(closing, "utf8")]);
 
-  const uploadRes = await notifyFetch(
-    `https://graph.facebook.com/v20.0/${phoneId}/media`,
-    {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      // undici's BodyInit typing conflicts with the DOM FormData type here.
-      body: form,
-    } as FetchInit
-  );
+  // Use global fetch for the multipart upload (more reliable than undici+FormData here).
+  const uploadRes = await fetch(`https://graph.facebook.com/v20.0/${phoneId}/media`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": `multipart/form-data; boundary=${boundary}`,
+    },
+    body,
+  });
   if (!uploadRes.ok) {
-    const body = await uploadRes.text().catch(() => "");
-    return { ok: false, provider: "meta", error: `upload HTTP ${uploadRes.status} ${body.slice(0, 160)}` };
+    const errBody = await uploadRes.text().catch(() => "");
+    console.error(`[notify] meta media upload failed: HTTP ${uploadRes.status} ${errBody.slice(0, 200)}`);
+    return { ok: false, provider: "meta", error: `upload HTTP ${uploadRes.status} ${errBody.slice(0, 160)}` };
   }
   const uploaded = (await uploadRes.json()) as { id?: string };
   if (!uploaded.id) {
+    console.error("[notify] meta media upload returned no id");
     return { ok: false, provider: "meta", error: "upload-missing-id" };
   }
 
-  // Step 2: send the media (+ caption) from the business number to the doctor.
+  // Send the media from the business number to the doctor.
+  // Keep caption short — Meta image captions max out at 1024 chars.
+  const shortCaption = caption.slice(0, 1024);
   const payload = isDocument
     ? {
         messaging_product: "whatsapp",
         to,
         type: "document",
-        document: { id: uploaded.id, caption: caption.slice(0, 1024), filename },
+        document: { id: uploaded.id, caption: shortCaption, filename },
       }
     : {
         messaging_product: "whatsapp",
         to,
         type: "image",
-        image: { id: uploaded.id, caption: caption.slice(0, 1024) },
+        image: { id: uploaded.id, caption: shortCaption },
       };
 
   const sendRes = await notifyFetch(`https://graph.facebook.com/v20.0/${phoneId}/messages`, {
@@ -299,9 +314,11 @@ async function sendMediaViaMeta(
     body: JSON.stringify(payload),
   });
   if (!sendRes.ok) {
-    const body = await sendRes.text().catch(() => "");
-    return { ok: false, provider: "meta", error: `HTTP ${sendRes.status} ${body.slice(0, 160)}` };
+    const errBody = await sendRes.text().catch(() => "");
+    console.error(`[notify] meta media send failed: HTTP ${sendRes.status} ${errBody.slice(0, 200)}`);
+    return { ok: false, provider: "meta", error: `HTTP ${sendRes.status} ${errBody.slice(0, 160)}` };
   }
+  console.log(`[notify] meta media sent to ${to} (mediaId=${uploaded.id})`);
   return { ok: true, provider: "meta" };
 }
 

@@ -472,6 +472,7 @@ async function finalizeService(from: string, s: Session) {
   };
   await appendToCollection("service_requests", request);
 
+  const isMedicine = request.service === "Home Medicine Delivery";
   const notifyText =
     `${s.data.emoji || "🏠"} New ${request.service} (WhatsApp bot) — ${siteConfig.name}\n` +
     `Ref: ${request.id}\n` +
@@ -481,25 +482,33 @@ async function finalizeService(from: string, s: Session) {
     `Landmark: ${request.landmark}\n` +
     `Details: ${request.details}`;
 
-  // If the patient uploaded a prescription/tests photo, forward the actual image
-  // to the doctor with the full details as the caption (one message avoids
-  // TextMeBot's rate-limit rule). Fall back to a text-only alert otherwise.
+  // Always send the text alert first so the doctor is never left without details.
+  await notifyDoctorWhatsApp(notifyText).catch(() => ({ ok: false }));
+
+  // Then forward the prescription / prescribed-tests photo as a separate image
+  // message (business WhatsApp → doctor's number) when the patient uploaded one.
   const mediaId = s.data.prescriptionMediaId;
-  let doctorNotified = false;
   if (mediaId) {
-    const media = await downloadMedia(mediaId).catch(() => null);
+    const media = await downloadMedia(mediaId).catch((err) => {
+      console.error("[wa-bot] downloadMedia failed:", err);
+      return null;
+    });
     if (media) {
-      const res = await notifyDoctorMedia(media.base64, media.mimeType, notifyText).catch(() => ({
-        ok: false,
-      }));
-      doctorNotified = res.ok;
+      const caption = isMedicine
+        ? `💊 Prescription for ${request.name} (${request.id})`
+        : `💉 Prescribed tests for ${request.name} (${request.id})`;
+      const res = await notifyDoctorMedia(media.base64, media.mimeType, caption).catch((err) => {
+        console.error("[wa-bot] notifyDoctorMedia failed:", err);
+        return { ok: false as const };
+      });
+      if (!res.ok) {
+        console.error("[wa-bot] prescription image was not delivered to doctor");
+      }
+    } else {
+      console.error("[wa-bot] could not download patient prescription media:", mediaId);
     }
   }
-  if (!doctorNotified) {
-    await notifyDoctorWhatsApp(notifyText).catch(() => ({ ok: false }));
-  }
 
-  const isMedicine = request.service === "Home Medicine Delivery";
   const teamLine = isMedicine
     ? "Our *pharmacist* will call you shortly to confirm your order and arrange delivery. 💊"
     : "Our *lab technician* will reach out shortly to schedule your home sample collection. 🧑‍🔬";

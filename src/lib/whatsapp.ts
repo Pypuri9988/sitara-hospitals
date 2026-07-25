@@ -136,7 +136,10 @@ export async function downloadMedia(
   mediaId: string
 ): Promise<{ base64: string; mimeType: string } | null> {
   const token = process.env.META_WA_TOKEN;
-  if (!token || !mediaId) return null;
+  if (!token || !mediaId) {
+    console.error("[whatsapp] downloadMedia: missing token or mediaId");
+    return null;
+  }
   try {
     // Step 1: resolve the short-lived media URL.
     const metaRes = await waFetch(`https://graph.facebook.com/${GRAPH_VERSION}/${mediaId}`, {
@@ -144,11 +147,15 @@ export async function downloadMedia(
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!metaRes.ok) {
-      console.error(`[whatsapp] media meta fetch failed: HTTP ${metaRes.status}`);
+      const body = await metaRes.text().catch(() => "");
+      console.error(`[whatsapp] media meta fetch failed: HTTP ${metaRes.status} ${body.slice(0, 160)}`);
       return null;
     }
     const meta = (await metaRes.json()) as { url?: string; mime_type?: string };
-    if (!meta.url) return null;
+    if (!meta.url) {
+      console.error("[whatsapp] media meta response had no url");
+      return null;
+    }
 
     // Step 2: download the actual bytes (also token-protected).
     const binRes = await waFetch(meta.url, {
@@ -160,6 +167,7 @@ export async function downloadMedia(
       return null;
     }
     const buf = Buffer.from(await binRes.arrayBuffer());
+    console.log(`[whatsapp] downloaded media ${mediaId} (${buf.length} bytes, ${meta.mime_type ?? "unknown"})`);
     return { base64: buf.toString("base64"), mimeType: meta.mime_type ?? "image/jpeg" };
   } catch (err) {
     console.error("[whatsapp] downloadMedia error:", err);
