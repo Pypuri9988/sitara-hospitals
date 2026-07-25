@@ -106,8 +106,8 @@ export type WhyPoint = {
 export const whyPoints: WhyPoint[] = [
   { title: "Globally trained", detail: "MRCP-UK from the Royal Colleges, London — rarely found in rural Andhra Pradesh.", icon: ShieldCheck },
   { title: "Root-cause approach", detail: "We look for why you're unwell, not just which number to lower.", icon: Stethoscope },
-  { title: "Time to listen", detail: "Longer consultations so nothing important gets missed.", icon: Clock },
-  { title: "Care at home", detail: "Home visits available for seniors and those who cannot travel easily.", icon: Home },
+  { title: "Exercise & Nutrition guidance", detail: "Practical exercise and nutrition plans tailored to your body and lifestyle.", icon: Clock },
+  { title: "Preventive medicine & adult vaccination", detail: "Preventive care and adult vaccinations to keep you well, not just treat illness.", icon: Home },
 ];
 
 export type BodyCompositionPoint = {

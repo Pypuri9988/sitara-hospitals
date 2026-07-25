@@ -15,7 +15,7 @@ type DoctorVideoProps = {
 const points = [
   "Globally trained — MRCP-UK, Royal Colleges, London",
   "Root-cause, personalized care — not just prescriptions",
-  "Unhurried consultations, time to truly listen",
+  "Exercise and Nutrition guidance",
 ];
 
 export function DoctorVideo({ src, poster }: DoctorVideoProps) {
@@ -48,7 +48,7 @@ export function DoctorVideo({ src, poster }: DoctorVideoProps) {
         {/* Text side */}
         <div className="order-2 lg:order-1">
           <span className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-600">
-            In Her Own Words
+            In His Own Words
           </span>
           <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
             A Message from Your Doctor
@@ -57,7 +57,7 @@ export function DoctorVideo({ src, poster }: DoctorVideoProps) {
           <p className="mt-5 text-base leading-relaxed text-slate-600">
             Hear directly from {siteConfig.doctor.name} about the kind of care
             you can expect — and why so many families in {siteConfig.location}{" "}
-            trust her with their health.
+            trust him with their health.
           </p>
 
           <ul className="mt-6 space-y-3">

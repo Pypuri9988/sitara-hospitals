@@ -34,7 +34,7 @@ export function BodyComposition() {
           </span>
         </div>
         <SectionHeading
-          eyebrow="Advanced Diagnostics · Only at Sri Sitara 360 Care"
+          eyebrow="Advanced Diagnostics · Only at Sri Sitara Hospital"
           title="Discover Your Body Like Never Before"
           subtitle="Our clinic-grade Body Composition Analysis reveals what your weight can never tell you — fat, muscle, water and hidden risks — in a single, painless 60-second scan."
         />

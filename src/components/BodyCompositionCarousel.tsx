@@ -13,27 +13,33 @@ type Slide = {
 
 const slides: Slide[] = [
   {
-    src: "/images/bca-report-dashboard.png",
-    alt: "Detailed body composition report showing body fat, muscle and metabolic age",
+    src: "/images/inbody4.jpeg",
+    alt: "Detailed body composition report showing body fat, muscle mass and metabolic age",
     caption: "Your full body report — in just 60 seconds",
     fit: "cover",
   },
   {
-    src: "/images/body-composition-analyzer.png",
-    alt: "Professional body composition analyser at Sri Sitara 360 Care",
-    caption: "Advanced, clinic-grade body analyser",
-    fit: "contain",
-  },
-  {
-    src: "/images/bca-doctor-review.png",
-    alt: "Doctor explaining a body composition report to a patient",
+    src: "/images/inbody2.jpeg",
+    alt: "Doctor explaining a body composition report to a patient at Sri Sitara Hospital",
     caption: "We explain every number, in simple words",
     fit: "cover",
   },
   {
-    src: "/images/bca-healthy-patient.png",
-    alt: "Happy, healthy patient after body composition guided care",
-    caption: "Know your true health — beyond the weighing scale",
+    src: "/images/inbody5.jpeg",
+    alt: "Clinic-grade InBody body composition analysers at Sri Sitara Hospital",
+    caption: "Know your body, transform your life",
+    fit: "cover",
+  },
+  {
+    src: "/images/inbody3.jpeg",
+    alt: "Professional InBody body composition analyser",
+    caption: "Advanced, clinic-grade InBody analyser",
+    fit: "contain",
+  },
+  {
+    src: "/images/inbody.jpeg",
+    alt: "Happy, healthy patient at Sri Sitara Hospital",
+    caption: "Personalized care beyond the weighing scale",
     fit: "cover",
   },
 ];

@@ -150,7 +150,7 @@ async function handleMenu(from: string, action: string) {
         updatedAt: Date.now(),
       };
       save(from, s);
-      await sendText(from, "💉 *Home Sample Collection*\n\nWe'll send a trained technician to collect your samples at home.\n\nFirst, what's the *patient's full name*?");
+      await sendText(from, "💉 *Home Sample Collection*\n\nWe'll send a trained technician to collect your samples at home.\n\n📋 *Please note:*\n• Samples are collected within a *10 km* range. Beyond 10 km, extra charges will be applicable.\n• Timings: *7 AM – 9 PM*\n\nFirst, what's the *patient's full name*?");
       return;
     }
     case "medicine": {
@@ -161,7 +161,7 @@ async function handleMenu(from: string, action: string) {
         updatedAt: Date.now(),
       };
       save(from, s);
-      await sendText(from, "💊 *Home Medicine Delivery*\n\nWe'll deliver your medicines to your doorstep.\n\nFirst, what's your *full name*?");
+      await sendText(from, "💊 *Home Medicine Delivery*\n\nWe'll deliver your medicines to your doorstep.\n\n📋 *Please note:*\n• Minimum order value: *₹999*\n• Delivery is free within *10 km*. Beyond 10 km, a delivery charge is applicable.\n• Timings: *9 AM – 7 PM*\n• Please keep a *photo of your prescription* ready to upload.\n\nFirst, what's your *full name*?");
       return;
     }
     case "conditions": {
@@ -388,7 +388,7 @@ async function handleService(from: string, s: Session, raw: string, choice: stri
       s.step = "details";
       save(from, s);
       if (isMedicine) {
-        await sendText(from, "💊 Which *medicines* do you need? You can list them here, or send a photo of your prescription.");
+        await sendText(from, "💊 Please *upload a photo of your prescription* now, or type the *medicines* you need.");
       } else {
         await sendText(from, "💉 Which *test(s)* do you need? Type the test name, or 'Doctor advised' if you're unsure.");
       }
