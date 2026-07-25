@@ -18,7 +18,7 @@ export const siteConfig = {
     photo: "/images/doctor-sitara360.png",
   },
   description:
-    "Sitara Holistic Care in Tanuku offers globally trained, evidence-based, personalized medicine for diabetes, obesity, blood pressure, thyroid and healthy aging.",
+    "Sri Sitara Hospital Tanuku offers globally trained, evidence-based, personalized medicine for diabetes, obesity, blood pressure, thyroid and healthy aging.",
   // Update these with your real numbers.
   phone: "+91 87121 26799",
   // WhatsApp business number in international format WITHOUT + or spaces.

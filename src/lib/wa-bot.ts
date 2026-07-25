@@ -482,31 +482,30 @@ async function finalizeService(from: string, s: Session) {
     `Landmark: ${request.landmark}\n` +
     `Details: ${request.details}`;
 
-  // Always send the text alert first so the doctor is never left without details.
-  await notifyDoctorWhatsApp(notifyText).catch(() => ({ ok: false }));
-
-  // Then forward the prescription / prescribed-tests photo as a separate image
-  // message (business WhatsApp → doctor's number) when the patient uploaded one.
+  // Prefer one Meta message: prescription/tests IMAGE + full patient details as
+  // caption (same behaviour that worked before). Fall back to text-only if media fails.
   const mediaId = s.data.prescriptionMediaId;
+  let doctorNotified = false;
   if (mediaId) {
     const media = await downloadMedia(mediaId).catch((err) => {
       console.error("[wa-bot] downloadMedia failed:", err);
       return null;
     });
     if (media) {
-      const caption = isMedicine
-        ? `💊 Prescription for ${request.name} (${request.id})`
-        : `💉 Prescribed tests for ${request.name} (${request.id})`;
-      const res = await notifyDoctorMedia(media.base64, media.mimeType, caption).catch((err) => {
+      const res = await notifyDoctorMedia(media.base64, media.mimeType, notifyText).catch((err) => {
         console.error("[wa-bot] notifyDoctorMedia failed:", err);
         return { ok: false as const };
       });
-      if (!res.ok) {
-        console.error("[wa-bot] prescription image was not delivered to doctor");
+      doctorNotified = res.ok;
+      if (!doctorNotified) {
+        console.error("[wa-bot] prescription image was not delivered to doctor — falling back to text");
       }
     } else {
       console.error("[wa-bot] could not download patient prescription media:", mediaId);
     }
+  }
+  if (!doctorNotified) {
+    await notifyDoctorWhatsApp(notifyText).catch(() => ({ ok: false }));
   }
 
   const teamLine = isMedicine

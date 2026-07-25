@@ -11,7 +11,7 @@ export function About() {
           <div className="overflow-hidden rounded-3xl shadow-lg">
             <Image
               src={siteConfig.images.clinic}
-              alt="Consultation room at Sitara Holistic Care"
+              alt="Consultation room at Sri Sitara Hospital Tanuku"
               width={900}
               height={600}
               className="h-full w-full object-cover"

@@ -252,31 +252,21 @@ async function sendMediaViaMeta(
   const filename = `prescription.${ext}`;
   const bytes = Buffer.from(base64, "base64");
 
-  // Build a proper multipart body. Using a hand-rolled boundary avoids
-  // undici/DOM FormData mismatches that silently break Meta's media upload.
-  const boundary = `----SitaraBoundary${Date.now()}`;
-  const preamble =
-    `--${boundary}\r\n` +
-    `Content-Disposition: form-data; name="messaging_product"\r\n\r\n` +
-    `whatsapp\r\n` +
-    `--${boundary}\r\n` +
-    `Content-Disposition: form-data; name="type"\r\n\r\n` +
-    `${safeMime}\r\n` +
-    `--${boundary}\r\n` +
-    `Content-Disposition: form-data; name="file"; filename="${filename}"\r\n` +
-    `Content-Type: ${safeMime}\r\n\r\n`;
-  const closing = `\r\n--${boundary}--\r\n`;
-  const body = Buffer.concat([Buffer.from(preamble, "utf8"), bytes, Buffer.from(closing, "utf8")]);
+  // Multipart upload via undici (same TLS settings as other notify calls).
+  // Use File + FormData so Meta receives a real filename and content-type.
+  const form = new FormData();
+  form.append("messaging_product", "whatsapp");
+  form.append("type", safeMime);
+  form.append(
+    "file",
+    new File([new Uint8Array(bytes)], filename, { type: safeMime })
+  );
 
-  // Use global fetch for the multipart upload (more reliable than undici+FormData here).
-  const uploadRes = await fetch(`https://graph.facebook.com/v20.0/${phoneId}/media`, {
+  const uploadRes = await notifyFetch(`https://graph.facebook.com/v20.0/${phoneId}/media`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": `multipart/form-data; boundary=${boundary}`,
-    },
-    body,
-  });
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  } as FetchInit);
   if (!uploadRes.ok) {
     const errBody = await uploadRes.text().catch(() => "");
     console.error(`[notify] meta media upload failed: HTTP ${uploadRes.status} ${errBody.slice(0, 200)}`);

@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
 import { PromoBanner } from "@/components/PromoBanner";
+import { WhatsAppMarquee } from "@/components/WhatsAppMarquee";
 import { TopBar } from "@/components/TopBar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   keywords: [
-    "Sitara Holistic Care",
+    "Sri Sitara Hospital Tanuku",
     "Sri Sitara 360 Care Tanuku",
     "diabetes doctor Tanuku",
     "internal medicine physician",
@@ -43,6 +44,7 @@ export default function RootLayout({
     <html lang="en" className={`${poppins.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background bg-mesh text-slate-900">
         <PromoBanner />
+        <WhatsAppMarquee />
         <TopBar />
         <Header />
         <main className="flex-1">{children}</main>

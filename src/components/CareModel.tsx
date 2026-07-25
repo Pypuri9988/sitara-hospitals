@@ -33,7 +33,7 @@ export function CareModel() {
                 ))}
               </ul>
               <a
-                href={whatsappLink(`Hello, I would like to know more about ${m.title} care at Sitara Holistic Care.`)}
+                href={whatsappLink(`Hello, I would like to know more about ${m.title} care at Sri Sitara Hospital Tanuku.`)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl border border-brand-200 px-4 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50"

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { Volume2, VolumeX, CheckCircle2, CalendarCheck } from "lucide-react";
+import { Volume2, VolumeX, CalendarCheck } from "lucide-react";
 import { siteConfig, whatsappLink } from "@/config/site";
 import { WhatsAppIcon } from "./WhatsAppIcon";
 
@@ -11,12 +11,6 @@ type DoctorVideoProps = {
   src: string;
   poster?: string;
 };
-
-const points = [
-  "What your first visit looks like — step by step",
-  "How we explain reports in simple, clear language",
-  "When to choose a clinic visit vs a home visit",
-];
 
 export function DoctorVideo({ src, poster }: DoctorVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -60,15 +54,6 @@ export function DoctorVideo({ src, poster }: DoctorVideoProps) {
             takes, and how we turn confusing reports into a clear next step —
             so you arrive ready, not anxious.
           </p>
-
-          <ul className="mt-6 space-y-3">
-            {points.map((p) => (
-              <li key={p} className="flex items-start gap-3 text-sm text-slate-700">
-                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
-                {p}
-              </li>
-            ))}
-          </ul>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
