@@ -12,6 +12,7 @@ export const siteConfig = {
     credentials: [
       { label: "MD", detail: "Internal Medicine" },
       { label: "MRCP-UK", detail: "Royal Colleges, London" },
+      { label: "FGID", detail: "CMC - Vellore" },
       { label: "10+ Years", detail: "Clinical Practice" },
     ],
     photo: "/images/doctor-sitara360.png",
@@ -24,7 +25,7 @@ export const siteConfig = {
   whatsappNumber: "918712126799",
   whatsappDefaultMessage:
     "Hello Sitara360 Care, I would like to book a consultation with Dr. Neelu Mahendra.",
-  email: "care@sitara360.com",
+  email: "askdoctor247@gmail.com",
   address: "Sri Sitara Hospital, Tanuku, West Godavari, Andhra Pradesh 534211",
   // Keep the map search on the Google-registered hospital name so the pin resolves.
   mapQuery: "Sri Sitara Hospital, Tanuku, Andhra Pradesh",

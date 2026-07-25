@@ -118,7 +118,7 @@ export function Hero() {
               <p className="text-sm font-medium text-brand-700">
                 {siteConfig.doctor.title}
               </p>
-              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+              <div className="mt-4 grid grid-cols-2 gap-2 text-center">
                 {siteConfig.doctor.credentials.map((c) => (
                   <div key={c.label} className="rounded-xl bg-brand-50 p-2">
                     <div className="text-sm font-extrabold text-brand-700">
