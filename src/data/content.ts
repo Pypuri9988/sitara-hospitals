@@ -92,7 +92,7 @@ export type FirstVisitStep = {
 
 export const firstVisit: FirstVisitStep[] = [
   { title: "Bring your current medicines", detail: "Any tablets you already take — a photo of the strip is perfectly fine.", icon: Pill },
-  { title: "Old reports help (not required)", detail: "Blood tests, scans or discharge summaries. Even partial records are useful.", icon: FileText },
+  { title: "Old reports help", detail: "Blood tests, scans or discharge summaries. Even partial records are useful.", icon: FileText },
   { title: "Note your main concerns", detail: "When did it start? What makes it worse? Writing it down saves time.", icon: ClipboardList },
   { title: "Set aside 30-45 minutes", detail: "First visits are unhurried. Try not to schedule anything right after.", icon: Clock },
 ];
