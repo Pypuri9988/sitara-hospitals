@@ -252,21 +252,32 @@ async function sendMediaViaMeta(
   const filename = `prescription.${ext}`;
   const bytes = Buffer.from(base64, "base64");
 
-  // Multipart upload via undici (same TLS settings as other notify calls).
-  // Use File + FormData so Meta receives a real filename and content-type.
-  const form = new FormData();
-  form.append("messaging_product", "whatsapp");
-  form.append("type", safeMime);
-  form.append(
-    "file",
-    new File([new Uint8Array(bytes)], filename, { type: safeMime })
-  );
+  // Hand-rolled multipart — undici/DOM FormData was dropping fields and Meta
+  // responded with "(#100) The parameter messaging_product is required".
+  const boundary = `----SitaraFormBoundary${Date.now()}${Math.random().toString(16).slice(2)}`;
+  const textPart = (name: string, value: string) =>
+    `--${boundary}\r\nContent-Disposition: form-data; name="${name}"\r\n\r\n${value}\r\n`;
+  const fileHead =
+    `--${boundary}\r\n` +
+    `Content-Disposition: form-data; name="file"; filename="${filename}"\r\n` +
+    `Content-Type: ${safeMime}\r\n\r\n`;
+  const uploadBody = Buffer.concat([
+    Buffer.from(textPart("messaging_product", "whatsapp"), "utf8"),
+    Buffer.from(textPart("type", safeMime), "utf8"),
+    Buffer.from(fileHead, "utf8"),
+    bytes,
+    Buffer.from(`\r\n--${boundary}--\r\n`, "utf8"),
+  ]);
 
   const uploadRes = await notifyFetch(`https://graph.facebook.com/v20.0/${phoneId}/media`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-    body: form,
-  } as FetchInit);
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": `multipart/form-data; boundary=${boundary}`,
+      "Content-Length": String(uploadBody.length),
+    },
+    body: uploadBody,
+  });
   if (!uploadRes.ok) {
     const errBody = await uploadRes.text().catch(() => "");
     console.error(`[notify] meta media upload failed: HTTP ${uploadRes.status} ${errBody.slice(0, 200)}`);
