@@ -17,6 +17,9 @@ import {
   Timer,
   Gauge,
   TrendingUp,
+  Thermometer,
+  Weight,
+  Heart,
 } from "lucide-react";
 
 export type Condition = {
@@ -27,11 +30,14 @@ export type Condition = {
 
 export const conditions: Condition[] = [
   { name: "Diabetes & Prediabetes", icon: Droplet, description: "Root-cause diabetes care that explains your numbers and helps you feel better, not just look controlled on paper." },
-  { name: "Hypertension", icon: HeartPulse, description: "Blood pressure management tailored to your body, lifestyle and other conditions." },
+  { name: "B.P & Heart Problems", icon: HeartPulse, description: "Blood pressure and heart care tailored to your body, lifestyle and other conditions." },
   { name: "Obesity & Metabolic Health", icon: Scale, description: "Investigating insulin resistance and hormones behind stubborn weight gain." },
   { name: "Thyroid & Fatty Liver", icon: Activity, description: "Careful evaluation of thyroid and liver issues that are often missed elsewhere." },
   { name: "Senior & Geriatric Care", icon: UserRound, description: "Unhurried, respectful care for older adults, with home visits when travel is hard." },
   { name: "PCOS & Hormonal Health", icon: Venus, description: "Personalized care for PCOS and hormonal imbalance that goes beyond symptoms." },
+  { name: "Fevers / Infections", icon: Thermometer, description: "Timely evaluation and treatment of fevers and common infections." },
+  { name: "Weight loss treatment", icon: Weight, description: "Medically supervised, sustainable weight loss guided by your metabolic health." },
+  { name: "Sexual Health", icon: Heart, description: "Confidential, respectful care for sexual and reproductive health concerns." },
 ];
 
 export type CareModel = {
