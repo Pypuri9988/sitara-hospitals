@@ -91,7 +91,7 @@ function isGreeting(text: string) {
   return /\b(hi|hello|hey|namaste|start|menu|home|options|help)\b/i.test(text.trim());
 }
 
-type Incoming = { id?: string; text?: string; profileName?: string };
+type Incoming = { id?: string; text?: string; profileName?: string; hasMedia?: boolean };
 
 /**
  * Main entry: process one incoming message and reply.
@@ -99,9 +99,11 @@ type Incoming = { id?: string; text?: string; profileName?: string };
 export async function handleIncoming(from: string, msg: Incoming): Promise<void> {
   const raw = (msg.text ?? "").trim();
   const choice = msg.id ?? ""; // id from a tapped list row / button
+  const hasMedia = msg.hasMedia ?? false; // photo/document (e.g. prescription scan)
 
-  // Global commands always work.
-  if (choice === "menu:home" || (!choice && isGreeting(raw))) {
+  // Global commands always work. (Ignore for media so an uploaded photo mid-flow
+  // isn't mistaken for a command.)
+  if (choice === "menu:home" || (!choice && !hasMedia && isGreeting(raw))) {
     clear(from);
     await sendMainMenu(from);
     return;
@@ -122,7 +124,7 @@ export async function handleIncoming(from: string, msg: Incoming): Promise<void>
   // Active flows.
   if (session.flow === "book") return handleBooking(from, session, raw, choice);
   if (session.flow === "register") return handleRegister(from, session, raw, choice);
-  if (session.flow === "service") return handleService(from, session, raw, choice);
+  if (session.flow === "service") return handleService(from, session, raw, choice, hasMedia);
 
   // Not in a flow and not a recognised command → show the menu.
   await sendMainMenu(from);
@@ -357,7 +359,7 @@ async function finalizeBooking(from: string, s: Session) {
   );
 }
 
-async function handleService(from: string, s: Session, raw: string, choice: string) {
+async function handleService(from: string, s: Session, raw: string, choice: string, hasMedia = false) {
   const isMedicine = s.data.service === "Home Medicine Delivery";
 
   switch (s.step) {
@@ -388,15 +390,27 @@ async function handleService(from: string, s: Session, raw: string, choice: stri
       s.step = "details";
       save(from, s);
       if (isMedicine) {
-        await sendText(from, "💊 Please *upload a photo of your prescription* now, or type the *medicines* you need.");
+        await sendText(from, "💊 Please *upload or click a photo of your prescription* now, or type the *medicines* you need.");
       } else {
-        await sendText(from, "💉 Which *test(s)* do you need? Type the test name, or 'Doctor advised' if you're unsure.");
+        await sendText(from, "💉 Please enter the *test name(s)* you need, or *upload/click a photo* of your prescribed tests. Type 'Doctor advised' if you're unsure.");
       }
       return;
 
     case "details": {
-      // Accept text; if a photo/empty comes through, note it for the call.
-      s.data.details = raw || (isMedicine ? "Prescription shared / to confirm on call" : "To confirm on call");
+      if (hasMedia) {
+        // Patient uploaded a photo/scan of their prescription or test list.
+        s.data.details = raw
+          ? (isMedicine ? `Prescription photo uploaded. Note: ${raw}` : `Prescribed tests photo uploaded. Note: ${raw}`)
+          : (isMedicine ? "Prescription photo uploaded on WhatsApp" : "Prescribed tests photo uploaded on WhatsApp");
+        await sendText(
+          from,
+          isMedicine
+            ? "✅ Got your prescription photo — thank you! Please confirm the details below."
+            : "✅ Got your test prescription photo — thank you! Please confirm the details below."
+        );
+      } else {
+        s.data.details = raw || (isMedicine ? "Prescription to be shared / confirmed on call" : "Tests to be confirmed on call");
+      }
       s.step = "confirm";
       save(from, s);
       await sendButtons(
@@ -453,10 +467,15 @@ async function finalizeService(from: string, s: Session) {
     `Details: ${request.details}`;
   await notifyDoctorWhatsApp(notifyText).catch(() => ({ ok: false }));
 
+  const isMedicine = request.service === "Home Medicine Delivery";
+  const teamLine = isMedicine
+    ? "Our *pharmacist* will call you shortly to confirm your order and arrange delivery. 💊"
+    : "Our *lab technician* will reach out shortly to schedule your home sample collection. 🧑‍🔬";
+
   clear(from);
   await sendText(
     from,
-    `✅ Thank you, ${request.name.split(" ")[0]}! Your *${request.service}* request is received.\n\n*Reference:* ${request.id}\n📍 ${request.address}\n🧭 ${request.landmark}\n\nOur team will call you shortly to confirm the timing. Send *Hi* anytime for the menu.`
+    `✅ Thank you, ${request.name.split(" ")[0]}! Your *${request.service}* request has been received.\n\n*Reference:* ${request.id}\n📍 ${request.address}\n🧭 ${request.landmark}\n\n${teamLine}\n\nSend *Hi* anytime for the menu.`
   );
 }
 

@@ -41,6 +41,8 @@ type WAMessage = {
     list_reply?: { id: string; title: string };
     button_reply?: { id: string; title: string };
   };
+  image?: { id?: string; caption?: string; mime_type?: string };
+  document?: { id?: string; caption?: string; filename?: string; mime_type?: string };
 };
 
 export async function POST(request: Request) {
@@ -67,6 +69,7 @@ export async function POST(request: Request) {
 
           let text: string | undefined;
           let id: string | undefined;
+          let hasMedia = false;
 
           if (m.type === "text") {
             text = m.text?.body;
@@ -77,10 +80,14 @@ export async function POST(request: Request) {
           } else if (m.type === "button") {
             // Legacy template quick-reply button.
             text = (m as unknown as { button?: { text?: string } }).button?.text;
+          } else if (m.type === "image" || m.type === "document") {
+            // Photo/scan of a prescription or test list uploaded by the patient.
+            hasMedia = true;
+            text = m.image?.caption ?? m.document?.caption;
           }
 
-          if (m.from && (text || id)) {
-            await handleIncoming(m.from, { id, text, profileName });
+          if (m.from && (text || id || hasMedia)) {
+            await handleIncoming(m.from, { id, text, profileName, hasMedia });
           }
         }
       }
