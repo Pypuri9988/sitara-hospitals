@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState } from "react";
 import { Volume2, VolumeX, CheckCircle2, CalendarCheck } from "lucide-react";
 import { siteConfig, whatsappLink } from "@/config/site";
@@ -69,13 +70,13 @@ export function DoctorVideo({ src, poster }: DoctorVideoProps) {
           </ul>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a
+            <Link
               href="/#book"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent-500 px-6 py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-accent-600"
             >
               <CalendarCheck className="h-4 w-4" />
               Book a Consultation
-            </a>
+            </Link>
             <a
               href={whatsappLink()}
               target="_blank"

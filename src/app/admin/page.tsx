@@ -67,6 +67,8 @@ export default function AdminPage() {
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
+    // Restore the saved token only after hydration to avoid SSR/client mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved) setToken(saved);
   }, []);
 
@@ -111,6 +113,8 @@ export default function AdminPage() {
   );
 
   useEffect(() => {
+    // Fetch dashboard data whenever the token becomes available/changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (token) fetchData(token);
   }, [token, fetchData]);
 

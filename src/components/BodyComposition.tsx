@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CheckCircle2, HeartPulse } from "lucide-react";
 import { whatsappLink } from "@/config/site";
 import { bodyCompositionPoints, bodyCompositionMetrics } from "@/data/content";
@@ -92,12 +93,12 @@ export function BodyComposition() {
                 <WhatsAppIcon className="h-4 w-4" />
                 Get Your Body Composition Test
               </a>
-              <a
+              <Link
                 href="/#book"
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-200 px-6 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50"
               >
                 Book at the clinic
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -6,7 +6,6 @@ import {
   X,
   Send,
   Bot,
-  CheckCircle2,
   MapPin,
   Loader2,
 } from "lucide-react";

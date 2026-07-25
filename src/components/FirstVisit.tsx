@@ -1,5 +1,4 @@
 import { firstVisit } from "@/data/content";
-import { SectionHeading } from "./SectionHeading";
 
 export function FirstVisit() {
   return (
