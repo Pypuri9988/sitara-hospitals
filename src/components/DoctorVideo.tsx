@@ -42,17 +42,25 @@ export function DoctorVideo({ src, poster }: DoctorVideoProps) {
         {/* Text side */}
         <div className="order-2 lg:order-1">
           <span className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-600">
-            Watch before you visit
+            Elder care · Influenza protection
           </span>
           <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
             A Message from Your Doctor
           </h2>
           <div className="mt-4 h-1 w-16 rounded-full bg-accent-500" />
           <p className="mt-5 text-base leading-relaxed text-slate-600">
-            Press play for a short note from {siteConfig.doctor.name}. In under
-            a minute you&apos;ll know what to bring, how long your first visit
-            takes, and how we turn confusing reports into a clear next step —
-            so you arrive ready, not anxious.
+            Press play to hear {siteConfig.doctor.name} explain why{" "}
+            <span className="font-semibold text-slate-800">vaccination for elders</span>{" "}
+            matters — and how protecting against the{" "}
+            <span className="font-semibold text-slate-800">influenza (flu) virus</span>{" "}
+            can prevent serious illness, hospital visits and complications in
+            older adults and those with long-term conditions.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-slate-500">
+            If you have a parent or senior at home, or you are above 60 / living
+            with diabetes, heart or lung disease, watch this short message — then
+            reach out on WhatsApp to ask about adult vaccination at{" "}
+            {siteConfig.locationName}.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -61,16 +69,18 @@ export function DoctorVideo({ src, poster }: DoctorVideoProps) {
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent-500 px-6 py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-accent-600"
             >
               <CalendarCheck className="h-4 w-4" />
-              Book a Consultation
+              Ask about vaccination
             </Link>
             <a
-              href={whatsappLink()}
+              href={whatsappLink(
+                "Hello Sitara360 Care, I would like to know more about elder vaccination and influenza (flu) protection."
+              )}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-200 px-6 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50"
             >
               <WhatsAppIcon className="h-4 w-4" />
-              Chat on WhatsApp
+              Ask on WhatsApp
             </a>
           </div>
         </div>
