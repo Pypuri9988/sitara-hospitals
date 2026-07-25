@@ -10,9 +10,9 @@
  * hosting, move `sessions` to a shared store (Redis, DB) so state survives.
  */
 
-import { sendText, sendList, sendButtons } from "@/lib/whatsapp";
+import { sendText, sendList, sendButtons, downloadMedia } from "@/lib/whatsapp";
 import { appendToCollection, generateId } from "@/lib/storage";
-import { notifyDoctorWhatsApp } from "@/lib/notify";
+import { notifyDoctorWhatsApp, notifyDoctorMedia } from "@/lib/notify";
 import { siteConfig, mapLink } from "@/config/site";
 import { conditions } from "@/data/content";
 
@@ -91,7 +91,13 @@ function isGreeting(text: string) {
   return /\b(hi|hello|hey|namaste|start|menu|home|options|help)\b/i.test(text.trim());
 }
 
-type Incoming = { id?: string; text?: string; profileName?: string; hasMedia?: boolean };
+type Incoming = {
+  id?: string;
+  text?: string;
+  profileName?: string;
+  hasMedia?: boolean;
+  mediaId?: string;
+};
 
 /**
  * Main entry: process one incoming message and reply.
@@ -100,6 +106,7 @@ export async function handleIncoming(from: string, msg: Incoming): Promise<void>
   const raw = (msg.text ?? "").trim();
   const choice = msg.id ?? ""; // id from a tapped list row / button
   const hasMedia = msg.hasMedia ?? false; // photo/document (e.g. prescription scan)
+  const mediaId = msg.mediaId ?? "";
 
   // Global commands always work. (Ignore for media so an uploaded photo mid-flow
   // isn't mistaken for a command.)
@@ -124,7 +131,7 @@ export async function handleIncoming(from: string, msg: Incoming): Promise<void>
   // Active flows.
   if (session.flow === "book") return handleBooking(from, session, raw, choice);
   if (session.flow === "register") return handleRegister(from, session, raw, choice);
-  if (session.flow === "service") return handleService(from, session, raw, choice, hasMedia);
+  if (session.flow === "service") return handleService(from, session, raw, choice, hasMedia, mediaId);
 
   // Not in a flow and not a recognised command → show the menu.
   await sendMainMenu(from);
@@ -359,7 +366,14 @@ async function finalizeBooking(from: string, s: Session) {
   );
 }
 
-async function handleService(from: string, s: Session, raw: string, choice: string, hasMedia = false) {
+async function handleService(
+  from: string,
+  s: Session,
+  raw: string,
+  choice: string,
+  hasMedia = false,
+  mediaId = ""
+) {
   const isMedicine = s.data.service === "Home Medicine Delivery";
 
   switch (s.step) {
@@ -399,6 +413,7 @@ async function handleService(from: string, s: Session, raw: string, choice: stri
     case "details": {
       if (hasMedia) {
         // Patient uploaded a photo/scan of their prescription or test list.
+        if (mediaId) s.data.prescriptionMediaId = mediaId;
         s.data.details = raw
           ? (isMedicine ? `Prescription photo uploaded. Note: ${raw}` : `Prescribed tests photo uploaded. Note: ${raw}`)
           : (isMedicine ? "Prescription photo uploaded on WhatsApp" : "Prescribed tests photo uploaded on WhatsApp");
@@ -465,7 +480,24 @@ async function finalizeService(from: string, s: Session) {
     `Address: ${request.address}\n` +
     `Landmark: ${request.landmark}\n` +
     `Details: ${request.details}`;
-  await notifyDoctorWhatsApp(notifyText).catch(() => ({ ok: false }));
+
+  // If the patient uploaded a prescription/tests photo, forward the actual image
+  // to the doctor with the full details as the caption (one message avoids
+  // TextMeBot's rate-limit rule). Fall back to a text-only alert otherwise.
+  const mediaId = s.data.prescriptionMediaId;
+  let doctorNotified = false;
+  if (mediaId) {
+    const media = await downloadMedia(mediaId).catch(() => null);
+    if (media) {
+      const res = await notifyDoctorMedia(media.base64, media.mimeType, notifyText).catch(() => ({
+        ok: false,
+      }));
+      doctorNotified = res.ok;
+    }
+  }
+  if (!doctorNotified) {
+    await notifyDoctorWhatsApp(notifyText).catch(() => ({ ok: false }));
+  }
 
   const isMedicine = request.service === "Home Medicine Delivery";
   const teamLine = isMedicine

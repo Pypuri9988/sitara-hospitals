@@ -150,6 +150,68 @@ async function sendViaTextMeBot(message: string): Promise<NotifyResult> {
   };
 }
 
+async function sendMediaToOneTextMeBot(
+  r: TmbRecipient,
+  base64: string,
+  caption: string,
+  isDocument: boolean
+): Promise<boolean> {
+  // TextMeBot accepts a base64 file inline (no public hosting needed): use the
+  // "file" field for images and "document" for PDFs.
+  const payload: Record<string, string> = {
+    recipient: r.phone,
+    apikey: r.apikey,
+    text: caption.slice(0, 1000),
+    [isDocument ? "document" : "file"]: base64,
+  };
+  try {
+    const res = await notifyFetch("https://api.textmebot.com/send.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const body = await res.text().catch(() => "");
+    if (!res.ok || /error/i.test(body)) {
+      console.error(`[notify] textmebot media -> ${r.phone} failed: HTTP ${res.status} ${body.slice(0, 160)}`);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error(`[notify] textmebot media -> ${r.phone} error:`, err);
+    return false;
+  }
+}
+
+/**
+ * Send a media file (e.g. a prescription photo) plus a caption to the doctor /
+ * clinic. Currently implemented for the TextMeBot provider via inline base64.
+ * Returns ok:false for other providers so the caller can fall back to text.
+ */
+export async function notifyDoctorMedia(
+  base64: string,
+  mimeType: string,
+  caption: string
+): Promise<NotifyResult> {
+  const provider = (process.env.WHATSAPP_PROVIDER || "none").toLowerCase();
+  if (provider !== "textmebot") {
+    return { ok: false, provider, error: "media-not-supported" };
+  }
+  const recipients = textMeBotRecipients();
+  if (recipients.length === 0) {
+    return { ok: false, provider: "textmebot", error: "missing-credentials" };
+  }
+  const isDocument = mimeType.startsWith("application/");
+  const results = await Promise.all(
+    recipients.map((r) => sendMediaToOneTextMeBot(r, base64, caption, isDocument))
+  );
+  const okAny = results.some(Boolean);
+  return {
+    ok: okAny,
+    provider: "textmebot",
+    error: okAny ? undefined : "all-recipients-failed",
+  };
+}
+
 async function sendViaCallMeBot(message: string): Promise<NotifyResult> {
   const phone = process.env.CALLMEBOT_PHONE;
   const apikey = process.env.CALLMEBOT_APIKEY;

@@ -70,6 +70,7 @@ export async function POST(request: Request) {
           let text: string | undefined;
           let id: string | undefined;
           let hasMedia = false;
+          let mediaId: string | undefined;
 
           if (m.type === "text") {
             text = m.text?.body;
@@ -83,11 +84,12 @@ export async function POST(request: Request) {
           } else if (m.type === "image" || m.type === "document") {
             // Photo/scan of a prescription or test list uploaded by the patient.
             hasMedia = true;
+            mediaId = m.image?.id ?? m.document?.id;
             text = m.image?.caption ?? m.document?.caption;
           }
 
           if (m.from && (text || id || hasMedia)) {
-            await handleIncoming(m.from, { id, text, profileName, hasMedia });
+            await handleIncoming(m.from, { id, text, profileName, hasMedia, mediaId });
           }
         }
       }

@@ -124,3 +124,45 @@ export function sendButtons(to: string, bodyText: string, buttons: ReplyButton[]
 export function markRead(messageId: string) {
   return send({ status: "read", message_id: messageId });
 }
+
+/**
+ * Download an inbound media item (e.g. a prescription photo the patient sent)
+ * from the Meta Cloud API and return it as base64. Media on Graph is behind an
+ * access-token-protected URL, so this needs the same META_WA_TOKEN.
+ *
+ * Returns null if it can't be fetched (never throws to the caller's flow).
+ */
+export async function downloadMedia(
+  mediaId: string
+): Promise<{ base64: string; mimeType: string } | null> {
+  const token = process.env.META_WA_TOKEN;
+  if (!token || !mediaId) return null;
+  try {
+    // Step 1: resolve the short-lived media URL.
+    const metaRes = await waFetch(`https://graph.facebook.com/${GRAPH_VERSION}/${mediaId}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!metaRes.ok) {
+      console.error(`[whatsapp] media meta fetch failed: HTTP ${metaRes.status}`);
+      return null;
+    }
+    const meta = (await metaRes.json()) as { url?: string; mime_type?: string };
+    if (!meta.url) return null;
+
+    // Step 2: download the actual bytes (also token-protected).
+    const binRes = await waFetch(meta.url, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!binRes.ok) {
+      console.error(`[whatsapp] media download failed: HTTP ${binRes.status}`);
+      return null;
+    }
+    const buf = Buffer.from(await binRes.arrayBuffer());
+    return { base64: buf.toString("base64"), mimeType: meta.mime_type ?? "image/jpeg" };
+  } catch (err) {
+    console.error("[whatsapp] downloadMedia error:", err);
+    return null;
+  }
+}
