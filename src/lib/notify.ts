@@ -14,10 +14,10 @@
  *   CALLMEBOT_PHONE   = 918712126799   (the doctor's WhatsApp number, no +)
  *   CALLMEBOT_APIKEY  = <key from one-time activation>
  *
- * Meta WhatsApp Cloud API (official):
+ * Meta WhatsApp Cloud API (official — recommended for doctor alerts):
  *   META_WA_TOKEN     = <permanent access token>
- *   META_WA_PHONE_ID  = <phone number id>
- *   DOCTOR_WHATSAPP   = 918712126799   (recipient, no +)
+ *   META_WA_PHONE_ID  = <business phone number id>  (sender, e.g. 8712126799)
+ *   DOCTOR_WHATSAPP   = 919886344763   (alert recipient, digits only, no +)
  *
  * Generic webhook (Zapier / Make / n8n / custom):
  *   WHATSAPP_WEBHOOK_URL = https://...
@@ -184,8 +184,7 @@ async function sendMediaToOneTextMeBot(
 
 /**
  * Send a media file (e.g. a prescription photo) plus a caption to the doctor /
- * clinic. Currently implemented for the TextMeBot provider via inline base64.
- * Returns ok:false for other providers so the caller can fall back to text.
+ * clinic. Supports TextMeBot (base64) and Meta Cloud API (upload + send).
  */
 export async function notifyDoctorMedia(
   base64: string,
@@ -193,23 +192,117 @@ export async function notifyDoctorMedia(
   caption: string
 ): Promise<NotifyResult> {
   const provider = (process.env.WHATSAPP_PROVIDER || "none").toLowerCase();
-  if (provider !== "textmebot") {
+  try {
+    if (provider === "meta") {
+      return await sendMediaViaMeta(base64, mimeType, caption);
+    }
+    if (provider === "textmebot") {
+      const recipients = textMeBotRecipients();
+      if (recipients.length === 0) {
+        return { ok: false, provider: "textmebot", error: "missing-credentials" };
+      }
+      const isDocument = mimeType.startsWith("application/");
+      const results = await Promise.all(
+        recipients.map((r) => sendMediaToOneTextMeBot(r, base64, caption, isDocument))
+      );
+      const okAny = results.some(Boolean);
+      return {
+        ok: okAny,
+        provider: "textmebot",
+        error: okAny ? undefined : "all-recipients-failed",
+      };
+    }
     return { ok: false, provider, error: "media-not-supported" };
+  } catch (err) {
+    console.error("[notify] doctor media failed:", err);
+    return {
+      ok: false,
+      provider,
+      error: err instanceof Error ? err.message : "unknown-error",
+    };
   }
-  const recipients = textMeBotRecipients();
-  if (recipients.length === 0) {
-    return { ok: false, provider: "textmebot", error: "missing-credentials" };
+}
+
+function doctorWhatsAppTo(): string {
+  return (process.env.DOCTOR_WHATSAPP || "").replace(/[^\d]/g, "");
+}
+
+async function sendMediaViaMeta(
+  base64: string,
+  mimeType: string,
+  caption: string
+): Promise<NotifyResult> {
+  const token = process.env.META_WA_TOKEN;
+  const phoneId = process.env.META_WA_PHONE_ID;
+  const to = doctorWhatsAppTo();
+  if (!token || !phoneId || !to) {
+    console.log("[notify] meta media selected but META_WA_TOKEN/PHONE_ID/DOCTOR_WHATSAPP missing.");
+    return { ok: false, provider: "meta", error: "missing-credentials" };
   }
+
   const isDocument = mimeType.startsWith("application/");
-  const results = await Promise.all(
-    recipients.map((r) => sendMediaToOneTextMeBot(r, base64, caption, isDocument))
+  const ext = mimeType.includes("png")
+    ? "png"
+    : mimeType.includes("pdf")
+      ? "pdf"
+      : mimeType.includes("webp")
+        ? "webp"
+        : "jpg";
+  const filename = `prescription.${ext}`;
+  const bytes = Buffer.from(base64, "base64");
+
+  // Step 1: upload media to Meta.
+  const form = new FormData();
+  form.append("messaging_product", "whatsapp");
+  form.append("type", mimeType || (isDocument ? "application/pdf" : "image/jpeg"));
+  form.append("file", new Blob([bytes], { type: mimeType || "image/jpeg" }), filename);
+
+  const uploadRes = await notifyFetch(
+    `https://graph.facebook.com/v20.0/${phoneId}/media`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      // undici's BodyInit typing conflicts with the DOM FormData type here.
+      body: form,
+    } as FetchInit
   );
-  const okAny = results.some(Boolean);
-  return {
-    ok: okAny,
-    provider: "textmebot",
-    error: okAny ? undefined : "all-recipients-failed",
-  };
+  if (!uploadRes.ok) {
+    const body = await uploadRes.text().catch(() => "");
+    return { ok: false, provider: "meta", error: `upload HTTP ${uploadRes.status} ${body.slice(0, 160)}` };
+  }
+  const uploaded = (await uploadRes.json()) as { id?: string };
+  if (!uploaded.id) {
+    return { ok: false, provider: "meta", error: "upload-missing-id" };
+  }
+
+  // Step 2: send the media (+ caption) from the business number to the doctor.
+  const payload = isDocument
+    ? {
+        messaging_product: "whatsapp",
+        to,
+        type: "document",
+        document: { id: uploaded.id, caption: caption.slice(0, 1024), filename },
+      }
+    : {
+        messaging_product: "whatsapp",
+        to,
+        type: "image",
+        image: { id: uploaded.id, caption: caption.slice(0, 1024) },
+      };
+
+  const sendRes = await notifyFetch(`https://graph.facebook.com/v20.0/${phoneId}/messages`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!sendRes.ok) {
+    const body = await sendRes.text().catch(() => "");
+    return { ok: false, provider: "meta", error: `HTTP ${sendRes.status} ${body.slice(0, 160)}` };
+  }
+  return { ok: true, provider: "meta" };
 }
 
 async function sendViaCallMeBot(message: string): Promise<NotifyResult> {
@@ -235,11 +328,14 @@ async function sendViaCallMeBot(message: string): Promise<NotifyResult> {
 async function sendViaMeta(message: string): Promise<NotifyResult> {
   const token = process.env.META_WA_TOKEN;
   const phoneId = process.env.META_WA_PHONE_ID;
-  const to = process.env.DOCTOR_WHATSAPP;
+  const to = doctorWhatsAppTo();
   if (!token || !phoneId || !to) {
     console.log("[notify] meta selected but META_WA_TOKEN/PHONE_ID/DOCTOR_WHATSAPP missing.");
     return { ok: false, provider: "meta", error: "missing-credentials" };
   }
+  // Sends FROM the business WhatsApp (META_WA_PHONE_ID / 8712126799)
+  // TO the doctor's alert number (DOCTOR_WHATSAPP) — a real inbound chat,
+  // not a self-message, so the phone shows a normal notification.
   const res = await notifyFetch(`https://graph.facebook.com/v20.0/${phoneId}/messages`, {
     method: "POST",
     headers: {
