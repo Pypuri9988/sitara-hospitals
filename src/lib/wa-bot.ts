@@ -426,7 +426,17 @@ async function finalizeBooking(from: string, s: Session) {
     `Preferred: ${appointment.preferredDate || "Any day"} - ${appointment.preferredTime || "Any time"}\n` +
     `Mode: ${appointment.mode}\n` +
     `Notes: ${appointment.message}`;
-  await notifyDoctorWhatsApp(notifyText).catch(() => ({ ok: false }));
+  const notifyRes = await notifyDoctorWhatsApp(notifyText).catch((err) => {
+    console.error("[wa-bot] notifyDoctorWhatsApp threw:", err);
+    return { ok: false as const, provider: "error", error: String(err) };
+  });
+  if (!notifyRes.ok) {
+    console.error(
+      `[wa-bot] doctor alert FAILED for ${appointment.id} via ${notifyRes.provider}: ${
+        "error" in notifyRes ? notifyRes.error : "unknown"
+      }`
+    );
+  }
 
   clear(from);
   await sendText(

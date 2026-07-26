@@ -66,19 +66,45 @@ export async function notifyDoctorWhatsApp(message: string): Promise<NotifyResul
   const provider = (process.env.WHATSAPP_PROVIDER || "none").toLowerCase();
 
   try {
+    let result: NotifyResult;
     switch (provider) {
       case "textmebot":
-        return await sendViaTextMeBot(message);
+        result = await sendViaTextMeBot(message);
+        break;
       case "callmebot":
-        return await sendViaCallMeBot(message);
+        result = await sendViaCallMeBot(message);
+        break;
       case "meta":
-        return await sendViaMeta(message);
+        result = await sendViaMeta(message);
+        break;
       case "webhook":
-        return await sendViaWebhook(message);
+        result = await sendViaWebhook(message);
+        break;
       default:
         console.log("\n[notify] WhatsApp provider not configured. Message was:\n" + message + "\n");
         return { ok: false, provider: "none", error: "not-configured" };
     }
+
+    // If Meta session/window send fails, fall back to TextMeBot when configured
+    // (common Meta error: 131047 — outside 24h customer-care window).
+    if (!result.ok && provider === "meta" && textMeBotRecipients().length > 0) {
+      console.error(
+        `[notify] meta failed (${result.error || "unknown"}); trying TextMeBot fallback`
+      );
+      const fallback = await sendViaTextMeBot(message);
+      if (fallback.ok) {
+        return { ok: true, provider: "textmebot-fallback" };
+      }
+      console.error(`[notify] textmebot fallback also failed: ${fallback.error || "unknown"}`);
+      return result;
+    }
+
+    if (!result.ok) {
+      console.error(`[notify] ${provider} failed: ${result.error || "unknown"}`);
+    } else {
+      console.log(`[notify] ${result.provider} alert sent ok`);
+    }
+    return result;
   } catch (err) {
     console.error("[notify] failed:", err);
     return {
@@ -369,8 +395,10 @@ async function sendViaMeta(message: string): Promise<NotifyResult> {
   });
   if (!res.ok) {
     const body = await res.text().catch(() => "");
+    console.error(`[notify] meta text send failed: HTTP ${res.status} ${body.slice(0, 300)}`);
     return { ok: false, provider: "meta", error: `HTTP ${res.status} ${body.slice(0, 160)}` };
   }
+  console.log(`[notify] meta text sent to ${to}`);
   return { ok: true, provider: "meta" };
 }
 
