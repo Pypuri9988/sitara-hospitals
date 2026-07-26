@@ -35,9 +35,9 @@ export const siteConfig = {
     homeVisit: "Home visits available for senior patients",
   },
   social: {
-    facebook: "#",
-    instagram: "#",
-    youtube: "#",
+    instagram: "https://www.instagram.com/sitara_hospitals",
+    linkedin:
+      "https://www.linkedin.com/in/dr-neelu-mahendra-sunkavalli-68417b194",
   },
   images: {
     hospital: "/images/hospital-exterior.png",

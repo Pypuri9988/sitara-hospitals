@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Quote } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { whyPoints } from "@/data/content";
+import { SocialLinks } from "./SocialLinks";
 
 export function About() {
   return (
@@ -45,6 +46,11 @@ export function About() {
             Physicians in London, is the same credential held by hospital
             specialists across the UK&apos;s NHS — a rarity in this region.
           </p>
+
+          <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+            Connect with us
+          </p>
+          <SocialLinks variant="about" />
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {whyPoints.map((p) => (

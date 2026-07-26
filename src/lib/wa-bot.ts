@@ -137,18 +137,48 @@ export async function handleIncoming(from: string, msg: Incoming): Promise<void>
   await sendMainMenu(from);
 }
 
+function isValidNamePart(raw: string) {
+  const t = raw.trim();
+  return t.length >= 2 && /[a-zA-Z\u0C00-\u0C7F]/.test(t);
+}
+
+function combinePatientName(firstName: string, surname: string) {
+  return `${firstName.trim()} ${surname.trim()}`.replace(/\s+/g, " ").trim();
+}
+
+/** Doctor alert lines: full name plus separate first/surname for clear records. */
+function patientNameNotifyLines(data: Record<string, string>, fallbackName: string) {
+  const first = (data.firstName || "").trim();
+  const surname = (data.surname || "").trim();
+  const full = (data.name || fallbackName).trim();
+  if (first && surname) {
+    return (
+      `Patient: ${full}\n` +
+      `First name: ${first}\n` +
+      `Surname: ${surname}`
+    );
+  }
+  return `Patient: ${full}`;
+}
+
 async function handleMenu(from: string, action: string) {
   switch (action) {
     case "book": {
       const s: Session = { flow: "book", step: "name", data: { phone: from }, updatedAt: Date.now() };
       save(from, s);
-      await sendText(from, "Great! Let's book your consultation. 📅\n\nWhat's your *full name*?");
+      await sendText(
+        from,
+        "Great! Let's book your consultation. 📅\n\nTo keep your medical records accurate, please share the patient's *first name* (given name)."
+      );
       return;
     }
     case "register": {
       const s: Session = { flow: "register", step: "name", data: { phone: from }, updatedAt: Date.now() };
       save(from, s);
-      await sendText(from, "Let's register you as a new patient. 📝\n\nWhat's the *patient's full name*?");
+      await sendText(
+        from,
+        "Let's register you as a new patient. 📝\n\nPlease share the patient's *first name* (given name)."
+      );
       return;
     }
     case "sample": {
@@ -159,7 +189,10 @@ async function handleMenu(from: string, action: string) {
         updatedAt: Date.now(),
       };
       save(from, s);
-      await sendText(from, "💉 *Home Sample Collection*\n\nWe'll send a trained technician to collect your samples at home.\n\n📋 *Please note:*\n• Samples are collected within a *10 km* range. Beyond 10 km, extra charges will be applicable.\n• Timings: *7 AM – 9 PM*\n\nFirst, what's the *patient's full name*?");
+      await sendText(
+        from,
+        "💉 *Home Sample Collection*\n\nWe'll send a trained technician to collect your samples at home.\n\n📋 *Please note:*\n• Samples are collected within a *10 km* range. Beyond 10 km, extra charges will be applicable.\n• Timings: *7 AM – 9 PM*\n\nTo begin, please share the patient's *first name* (given name)."
+      );
       return;
     }
     case "medicine": {
@@ -170,7 +203,10 @@ async function handleMenu(from: string, action: string) {
         updatedAt: Date.now(),
       };
       save(from, s);
-      await sendText(from, "💊 *Home Medicine Delivery*\n\nWe'll deliver your medicines to your doorstep.\n\n📋 *Please note:*\n• Minimum order value: *₹999*\n• Delivery is free within *10 km*. Beyond 10 km, a delivery charge is applicable.\n• Timings: *9 AM – 7 PM*\n• Please keep a *photo of your prescription* ready to upload.\n\nFirst, what's your *full name*?");
+      await sendText(
+        from,
+        "💊 *Home Medicine Delivery*\n\nWe'll deliver your medicines to your doorstep.\n\n📋 *Please note:*\n• Minimum order value: *₹999*\n• Delivery is free within *10 km*. Beyond 10 km, a delivery charge is applicable.\n• Timings: *9 AM – 7 PM*\n• Please keep a *photo of your prescription* ready to upload.\n\nTo begin, please share your *first name* (given name)."
+      );
       return;
     }
     case "conditions": {
@@ -207,7 +243,10 @@ async function handleMenu(from: string, action: string) {
     case "talk": {
       const s: Session = { flow: "book", step: "talk-name", data: { phone: from }, updatedAt: Date.now() };
       save(from, s);
-      await sendText(from, `You can also call us directly at ${siteConfig.phone}. 📞\n\nTo have our team call you back, what's your *name*?`);
+      await sendText(
+        from,
+        `You can also call us directly at ${siteConfig.phone}. 📞\n\nTo have our team call you back, please share your *first name*.`
+      );
       return;
     }
     default:
@@ -218,16 +257,31 @@ async function handleMenu(from: string, action: string) {
 async function handleBooking(from: string, s: Session, raw: string, choice: string) {
   switch (s.step) {
     case "name":
-      if (raw.length < 2) {
-        await sendText(from, "Please enter a valid name so we can address you correctly. 🙂");
+      if (!isValidNamePart(raw)) {
+        await sendText(from, "Please enter a valid *first name* so we can address you correctly. 🙂");
         return;
       }
-      s.data.name = raw;
+      s.data.firstName = raw.trim();
+      s.step = "surname";
+      save(from, s);
+      await sendText(
+        from,
+        `Thank you, ${s.data.firstName}. Please share the patient's *surname* (family name) as well — this helps us keep hospital records clear and complete.`
+      );
+      return;
+
+    case "surname":
+      if (!isValidNamePart(raw)) {
+        await sendText(from, "Please enter a valid *surname* (family name). 🙂");
+        return;
+      }
+      s.data.surname = raw.trim();
+      s.data.name = combinePatientName(s.data.firstName || "", s.data.surname);
       s.step = "condition";
       save(from, s);
       await sendList(
         from,
-        `Thanks, ${raw.split(" ")[0]}! What's your main *health concern*?`,
+        `Thank you, ${s.data.firstName}. What's the main *health concern*?`,
         "Choose concern",
         [
           ...conditions.map((c, i) => ({ id: `cond:${i}`, title: c.name })),
@@ -237,11 +291,26 @@ async function handleBooking(from: string, s: Session, raw: string, choice: stri
       return;
 
     case "talk-name":
-      if (raw.length < 2) {
-        await sendText(from, "Please enter a valid name. 🙂");
+      if (!isValidNamePart(raw)) {
+        await sendText(from, "Please enter a valid *first name*. 🙂");
         return;
       }
-      s.data.name = raw;
+      s.data.firstName = raw.trim();
+      s.step = "talk-surname";
+      save(from, s);
+      await sendText(
+        from,
+        `Thank you, ${s.data.firstName}. Please share your *surname* (family name) as well — so our team can find you quickly when calling back.`
+      );
+      return;
+
+    case "talk-surname":
+      if (!isValidNamePart(raw)) {
+        await sendText(from, "Please enter a valid *surname* (family name). 🙂");
+        return;
+      }
+      s.data.surname = raw.trim();
+      s.data.name = combinePatientName(s.data.firstName || "", s.data.surname);
       s.data.condition = "Call Back Request";
       s.data.preferredDate = "";
       s.data.preferredTime = "Any time";
@@ -351,7 +420,7 @@ async function finalizeBooking(from: string, s: Session) {
   const notifyText =
     `🩺 New Booking (WhatsApp bot) — ${siteConfig.name}\n` +
     `Ref: ${appointment.id}\n` +
-    `Name: ${appointment.name}\n` +
+    `${patientNameNotifyLines(s.data, appointment.name)}\n` +
     `Phone: ${appointment.phone}\n` +
     `Concern: ${appointment.condition}\n` +
     `Preferred: ${appointment.preferredDate || "Any day"} - ${appointment.preferredTime || "Any time"}\n` +
@@ -378,11 +447,26 @@ async function handleService(
 
   switch (s.step) {
     case "name":
-      if (raw.length < 2) {
-        await sendText(from, "Please enter a valid name so our team can address you correctly. 🙂");
+      if (!isValidNamePart(raw)) {
+        await sendText(from, "Please enter a valid *first name* so our team can address you correctly. 🙂");
         return;
       }
-      s.data.name = raw;
+      s.data.firstName = raw.trim();
+      s.step = "surname";
+      save(from, s);
+      await sendText(
+        from,
+        `Thank you, ${s.data.firstName}. Please share the patient's *surname* (family name) as well — this helps our team identify the right patient.`
+      );
+      return;
+
+    case "surname":
+      if (!isValidNamePart(raw)) {
+        await sendText(from, "Please enter a valid *surname* (family name). 🙂");
+        return;
+      }
+      s.data.surname = raw.trim();
+      s.data.name = combinePatientName(s.data.firstName || "", s.data.surname);
       s.step = "address";
       save(from, s);
       await sendText(from, "📍 Please share your *exact address* — house/flat no, street and area.");
@@ -476,7 +560,7 @@ async function finalizeService(from: string, s: Session) {
   const notifyText =
     `${s.data.emoji || "🏠"} New ${request.service} (WhatsApp bot) — ${siteConfig.name}\n` +
     `Ref: ${request.id}\n` +
-    `Name: ${request.name}\n` +
+    `${patientNameNotifyLines(s.data, request.name)}\n` +
     `Phone: ${request.phone}\n` +
     `Address: ${request.address}\n` +
     `Landmark: ${request.landmark}\n` +
@@ -522,14 +606,29 @@ async function finalizeService(from: string, s: Session) {
 async function handleRegister(from: string, s: Session, raw: string, choice: string) {
   switch (s.step) {
     case "name":
-      if (raw.length < 2) {
-        await sendText(from, "Please enter a valid name. 🙂");
+      if (!isValidNamePart(raw)) {
+        await sendText(from, "Please enter a valid *first name*. 🙂");
         return;
       }
-      s.data.name = raw;
+      s.data.firstName = raw.trim();
+      s.step = "surname";
+      save(from, s);
+      await sendText(
+        from,
+        `Thank you. Please share the patient's *surname* (family name) as well — we use this for registration and future visits.`
+      );
+      return;
+
+    case "surname":
+      if (!isValidNamePart(raw)) {
+        await sendText(from, "Please enter a valid *surname* (family name). 🙂");
+        return;
+      }
+      s.data.surname = raw.trim();
+      s.data.name = combinePatientName(s.data.firstName || "", s.data.surname);
       s.step = "age";
       save(from, s);
-      await sendText(from, "What's the patient's *age*?");
+      await sendText(from, `Thank you, ${s.data.firstName}. What's the patient's *age*?`);
       return;
 
     case "age":
@@ -569,7 +668,7 @@ async function handleRegister(from: string, s: Session, raw: string, choice: str
       const notifyText =
         `📝 New Patient Reg. (WhatsApp bot) — ${siteConfig.name}\n` +
         `Ref: ${registration.id}\n` +
-        `Name: ${registration.name}\n` +
+        `${patientNameNotifyLines(s.data, registration.name)}\n` +
         `Phone: ${registration.phone}\n` +
         `Age/Gender: ${registration.age || "-"} / ${registration.gender || "-"}\n` +
         `City: ${registration.city || "-"}\n` +
