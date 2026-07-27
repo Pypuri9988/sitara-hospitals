@@ -18,15 +18,17 @@ export function SectionHeading({
       }
     >
       {eyebrow && (
-        <span className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-600">
+        <span className="block max-w-full break-words text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-600 sm:text-sm sm:tracking-[0.18em]">
           {eyebrow}
         </span>
       )}
-      <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+      <h2 className="mt-2 max-w-full break-words text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
         {title}
       </h2>
       {subtitle && (
-        <p className="mt-3 text-base leading-relaxed text-slate-600">{subtitle}</p>
+        <p className="mt-3 max-w-full text-base leading-relaxed break-words text-slate-600">
+          {subtitle}
+        </p>
       )}
       <div
         className={`mt-4 h-1 w-16 rounded-full bg-accent-500 ${

@@ -67,7 +67,7 @@ export function BodyCompositionCarousel() {
 
   return (
     <div
-      className="relative"
+      className="relative overflow-hidden pb-8"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -132,7 +132,7 @@ export function BodyCompositionCarousel() {
       </div>
 
       {/* Floating badge */}
-      <div className="absolute -bottom-4 left-6 z-10 flex items-center gap-2 rounded-2xl bg-brand-700 px-4 py-2.5 text-white shadow-xl">
+      <div className="absolute bottom-0 left-4 z-10 flex max-w-[calc(100%-2rem)] items-center gap-2 rounded-2xl bg-brand-700 px-4 py-2.5 text-white shadow-xl">
         <span className="text-lg font-extrabold">60-sec</span>
         <span className="text-[11px] uppercase leading-tight tracking-wider text-brand-100">
           full body

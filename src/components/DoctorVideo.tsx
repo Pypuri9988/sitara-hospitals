@@ -37,7 +37,7 @@ export function DoctorVideo({ src, poster }: DoctorVideoProps) {
   };
 
   return (
-    <section id="doctor-video" className="px-4 py-16">
+    <section id="doctor-video" className="overflow-hidden px-4 py-16">
       <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2">
         {/* Text side */}
         <div className="order-2 lg:order-1">
@@ -86,7 +86,7 @@ export function DoctorVideo({ src, poster }: DoctorVideoProps) {
         </div>
 
         {/* Video side */}
-        <div className="relative order-1 lg:order-2">
+        <div className="relative order-1 overflow-hidden lg:order-2">
           <div className="absolute -inset-1 rounded-[2.3rem] bg-gradient-to-r from-brand-400 via-brand-600 to-accent-500 opacity-25 blur-md" />
 
           <div

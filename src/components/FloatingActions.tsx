@@ -42,8 +42,8 @@ export function FloatingActions() {
         </a>
       </div>
 
-      {/* Mobile bottom action bar */}
-      <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 border-t border-slate-200 bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.06)] sm:hidden">
+      {/* Mobile bottom action bar — locked to viewport, no horizontal drift */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 grid w-full max-w-[100vw] grid-cols-3 border-t border-slate-200 bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.06)] sm:hidden">
         <a
           href={telLink()}
           className="flex flex-col items-center gap-1 py-2.5 text-xs font-medium text-brand-700"

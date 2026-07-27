@@ -49,8 +49,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${poppins.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-background bg-mesh text-slate-900">
+    <html lang="en" className={`${poppins.variable} h-full max-w-full overflow-x-hidden antialiased`}>
+      <body className="relative flex min-h-full max-w-full flex-col overflow-x-hidden bg-background bg-mesh text-slate-900">
         <PromoBanner />
         <WhatsAppMarquee />
         <TopBar />

@@ -7,9 +7,9 @@ export function PromoBanner() {
       href="/#body-analysis"
       className="group block bg-gradient-to-r from-brand-600 via-brand-500 to-accent-500 text-white"
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs font-semibold sm:text-sm">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-2 px-4 py-2 text-center text-xs font-semibold sm:text-sm">
         <Sparkles className="h-4 w-4 shrink-0 animate-pulse text-white" />
-        <span>
+        <span className="min-w-0 max-w-full text-balance">
           <span className="font-extrabold">NEW</span> · Body Composition
           Analysis — know your body fat, muscle &amp; metabolic age in{" "}
           <span className="font-extrabold">60 seconds</span>
